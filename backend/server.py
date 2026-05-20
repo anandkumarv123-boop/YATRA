@@ -691,6 +691,10 @@ app.add_middleware(CORSMiddleware, allow_credentials=True,
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
+@app.get("/manifest.json")
+async def manifest():
+    return FileResponse(STATIC_DIR / "manifest.json", media_type="application/manifest+json")
+
 @app.get("/{full_path:path}")
 def serve_frontend(full_path: str):
     """Catch-all: serve index.html for any non-API route."""
