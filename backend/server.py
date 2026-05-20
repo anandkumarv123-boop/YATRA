@@ -23,13 +23,18 @@ ADMIN_PIN = os.environ.get("ADMIN_PIN", "1234")
 # ─── AI Helper ────────────────
 async def call_claude(prompt: str, max_tokens: int = 200, system: str = "You are Yatra AI — a calm, helpful, India-focused railway travel assistant. Be concise."):
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
-        key = os.environ.get('EMERGENT_LLM_KEY')
+        import anthropic
+        key = os.environ.get('ANTHROPIC_API_KEY')
         if not key: return None
-        chat = LlmChat(api_key=key, session_id=f"yatra-{uuid.uuid4().hex[:8]}", system_message=system,
-        ).with_model("anthropic", "claude-haiku-4-5-20251001")
-        resp = await chat.send_message(UserMessage(text=prompt))
-        return resp.strip() if resp else None
+        client = anthropic.AsyncAnthropic(api_key=key)
+        resp = await client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=max_tokens,
+            system=system,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = resp.content[0].text if resp.content else None
+        return text.strip() if text else None
     except Exception as e:
         logging.error(f"Claude error: {e}")
         return None
