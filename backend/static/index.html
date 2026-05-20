@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Yatra Sathi — Smart Rail Travel Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070912;--s1:#0E1220;--s2:#161B2D;--s3:#1F2740;--s4:#2A3354;
+  --border:rgba(120,140,210,0.13);--border2:rgba(120,140,210,0.25);--border3:rgba(120,140,210,0.4);
+  --pink:#FF1B6D;--pink2:#FF5FA0;--pink-dim:rgba(255,27,109,0.1);
+  --red:#EF4444;--red-dim:rgba(239,68,68,0.12);
+  --orange:#FF7A1A;--orange2:#FFA85C;--orange-dim:rgba(255,122,26,0.12);
+  --blue:#3B7BF6;--blue2:#60A5FA;--blue-dim:rgba(59,123,246,0.12);
+  --green:#22C55E;--green2:#4ADE80;--green-dim:rgba(34,197,94,0.12);
+  --amber:#F59E0B;--amber-dim:rgba(245,158,11,0.12);
+  --purple:#A855F7;--purple2:#C084FC;--purple-dim:rgba(168,85,247,0.12);
+  --teal:#14B8A6;--teal-dim:rgba(20,184,166,0.12);
+  --text:#F3F6FF;--text2:#A0AEC8;--text3:#5F6E8A;--text4:#34405A;
+  --mono:'JetBrains Mono',monospace;--sans:'Sora',sans-serif;
+  --nav-h:54px;--bot-h:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-user-select:none;user-select:none;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 50% at 95% -5%,rgba(255,27,109,0.09) 0%,transparent 55%),radial-gradient(ellipse 60% 40% at -5% 100%,rgba(59,123,246,0.07) 0%,transparent 55%),radial-gradient(ellipse 50% 35% at 50% 50%,rgba(168,85,247,0.04) 0%,transparent 65%);}
+.shell{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;}
+
+/* TOP NAV */
+.nav{height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--border);background:rgba(7,9,18,0.94);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);position:relative;z-index:100;flex-shrink:0;}
+.nav::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--pink),var(--orange),var(--blue),transparent);}
+.brand{display:flex;align-items:center;gap:9px;cursor:pointer;}
+.brand-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#FF1B6D 0%,#FF7A1A 100%);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 18px rgba(255,27,109,0.4);}
+.brand-name{font-size:14.5px;font-weight:800;letter-spacing:-0.3px;}
+.brand-tag{font-size:8px;font-weight:700;color:var(--orange);letter-spacing:1.4px;text-transform:uppercase;}
+.user-bar{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:999px;background:var(--s2);border:1px solid var(--border2);cursor:pointer;}
+.user-avatar-sm{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--orange));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;}
+.user-bar-name{font-size:10px;font-weight:700;}
+.user-bar-verify{font-size:8px;color:var(--green);font-weight:700;}
+.live-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.22);font-size:9px;font-weight:700;color:var(--green);font-family:var(--mono);}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+
+/* PAGES */
+.pages{flex:1;position:relative;overflow:hidden;}
+.page{display:none;position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--bot-h) + 16px);-webkit-overflow-scrolling:touch;scroll-behavior:smooth;animation:pageIn 0.3s cubic-bezier(0.22,1,0.36,1);}
+.page.active{display:block;}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* BOTTOM NAV — Flipkart style: 5 fixed icons */
+.bottom-nav{height:var(--bot-h);display:flex;align-items:stretch;border-top:1px solid var(--border);background:rgba(7,9,18,0.97);backdrop-filter:blur(24px);position:relative;z-index:100;flex-shrink:0;}
+.bottom-nav::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--pink),var(--orange),var(--blue),transparent);}
+.nav-btn{flex:1;border:none;background:transparent;color:var(--text3);font-family:var(--sans);font-size:9.5px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 4px;border-top:2px solid transparent;position:relative;transition:color 0.15s;}
+.nav-btn.active{color:var(--pink);border-top-color:var(--pink);}
+.nav-btn.active::before{content:'';position:absolute;top:0;left:25%;right:25%;height:1.5px;background:var(--pink);box-shadow:0 0 8px var(--pink);}
+.nav-icon{font-size:19px;line-height:1;}
+.nav-btn.sos-nav{color:var(--red);}
+.nav-btn.sos-nav.active{border-top-color:var(--red);}
+
+/* SEARCH BAR (Flipkart style at top of pages) */
+.search-bar{display:flex;align-items:center;gap:8px;margin:10px 14px;padding:10px 12px;background:var(--s1);border:1px solid var(--border);border-radius:12px;font-size:11.5px;color:var(--text2);cursor:pointer;}
+.search-bar-icon{font-size:14px;}
+.search-bar-text{flex:1;}
+.search-bar-mic{padding:4px 8px;background:var(--purple-dim);color:var(--purple);border-radius:6px;font-size:10px;font-weight:700;}
+
+/* HERO BANNER — Flipkart promo style */
+.hero-banner{margin:6px 14px 14px;border-radius:16px;padding:18px 16px;position:relative;overflow:hidden;cursor:pointer;}
+.hero-banner.gradient-1{background:linear-gradient(135deg,#FF1B6D 0%,#FF7A1A 100%);}
+.hero-banner.gradient-2{background:linear-gradient(135deg,#3B7BF6 0%,#A855F7 100%);}
+.hero-banner.gradient-3{background:linear-gradient(135deg,#14B8A6 0%,#22C55E 100%);}
+.hero-banner.gradient-4{background:linear-gradient(135deg,#F59E0B 0%,#EF4444 100%);}
+.hero-pretitle{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;opacity:0.88;margin-bottom:4px;}
+.hero-title{font-size:20px;font-weight:900;line-height:1.15;margin-bottom:4px;letter-spacing:-0.5px;}
+.hero-subtitle{font-size:11px;font-weight:500;opacity:0.92;margin-bottom:10px;line-height:1.4;}
+.hero-cta{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:rgba(255,255,255,0.22);backdrop-filter:blur(8px);border-radius:999px;font-size:10.5px;font-weight:700;}
+.hero-banner-art{position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-size:80px;opacity:0.18;}
+
+/* SECTION (Flipkart-style category section) */
+.section{margin-bottom:18px;}
+.section-head{display:flex;align-items:center;justify-content:space-between;padding:0 14px;margin-bottom:10px;}
+.section-title{font-size:14px;font-weight:800;letter-spacing:-0.3px;}
+.section-link{font-size:10px;font-weight:700;color:var(--orange);cursor:pointer;}
+
+/* HORIZONTAL SCROLL */
+.h-scroll{display:flex;gap:10px;padding:0 14px 4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.h-scroll::-webkit-scrollbar{display:none;}
+
+/* QUICK-ACCESS GRID — Flipkart 4-col home icons */
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 14px;margin-bottom:14px;}
+.quick-cell{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:10px 4px;text-align:center;cursor:pointer;transition:transform 0.18s;}
+.quick-cell:active{transform:scale(0.94);}
+.quick-icon{font-size:24px;margin-bottom:4px;display:block;line-height:1;}
+.quick-label{font-size:9.5px;font-weight:700;color:var(--text2);line-height:1.2;}
+
+/* CATEGORY CHIPS */
+.chips-row{display:flex;gap:7px;padding:0 14px 12px;overflow-x:auto;scrollbar-width:none;}
+.chips-row::-webkit-scrollbar{display:none;}
+.chip{padding:6px 12px;background:var(--s2);border:1px solid var(--border2);border-radius:999px;font-size:10px;font-weight:700;color:var(--text2);white-space:nowrap;cursor:pointer;transition:all 0.18s;}
+.chip.active{background:var(--pink-dim);color:var(--pink);border-color:rgba(255,27,109,0.35);}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:12px;cursor:pointer;transition:transform 0.18s,border-color 0.18s;}
+.card:active{transform:scale(0.97);}
+.card:hover{border-color:var(--border2);}
+
+/* VENDOR CARD (Food) */
+.vendor-card{flex:0 0 180px;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:11px;cursor:pointer;position:relative;}
+.vendor-logo{font-size:36px;margin-bottom:6px;line-height:1;}
+.vendor-badge{position:absolute;top:8px;right:8px;font-size:8px;font-weight:800;padding:2px 7px;border-radius:5px;}
+.vendor-badge.irctc{background:rgba(34,197,94,0.18);color:var(--green);}
+.vendor-badge.zomato{background:rgba(239,68,68,0.18);color:#FF6E6E;}
+.vendor-badge.station{background:rgba(59,123,246,0.18);color:var(--blue2);}
+.vendor-badge.home{background:rgba(168,85,247,0.18);color:var(--purple2);}
+.vendor-name{font-size:11.5px;font-weight:800;line-height:1.25;margin-bottom:3px;}
+.vendor-meta{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--text3);margin-bottom:4px;}
+.vendor-rating{background:var(--green);color:#fff;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:800;}
+.vendor-prep{font-size:9px;color:var(--orange);font-weight:700;}
+.vendor-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
+.vendor-tag{font-size:7.5px;background:var(--s3);color:var(--text2);padding:1px 5px;border-radius:3px;font-weight:600;}
+
+/* MENU ITEM */
+.menu-item{display:flex;gap:10px;padding:10px;background:var(--s1);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;}
+.menu-item-img{width:54px;height:54px;border-radius:10px;background:linear-gradient(135deg,var(--orange-dim),var(--pink-dim));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.menu-item-body{flex:1;min-width:0;}
+.menu-item-name{font-size:11.5px;font-weight:800;margin-bottom:2px;}
+.menu-item-desc{font-size:9.5px;color:var(--text3);line-height:1.35;margin-bottom:4px;}
+.menu-item-bottom{display:flex;align-items:center;justify-content:space-between;}
+.menu-item-price{font-size:12.5px;font-weight:800;color:var(--orange);}
+.menu-item-diet-tag{font-size:8px;background:var(--green-dim);color:var(--green);padding:1px 5px;border-radius:3px;font-weight:700;margin-right:3px;}
+.menu-item-add{padding:5px 12px;background:var(--pink);color:#fff;border:none;border-radius:6px;font-size:10px;font-weight:800;font-family:var(--sans);cursor:pointer;}
+.veg-dot{display:inline-block;width:11px;height:11px;border:1.5px solid var(--green);border-radius:2px;position:relative;margin-right:4px;vertical-align:middle;}
+.veg-dot::after{content:'';width:5px;height:5px;background:var(--green);border-radius:50%;position:absolute;top:1.5px;left:1.5px;}
+.nonveg-dot{display:inline-block;width:11px;height:11px;border:1.5px solid var(--red);border-radius:2px;position:relative;margin-right:4px;vertical-align:middle;}
+.nonveg-dot::after{content:'';width:5px;height:5px;background:var(--red);border-radius:50%;position:absolute;top:1.5px;left:1.5px;}
+
+/* CART BAR */
+.cart-bar{position:fixed;bottom:calc(var(--bot-h) + 6px);left:10px;right:10px;background:linear-gradient(135deg,#FF1B6D,#FF7A1A);color:#fff;border-radius:14px;padding:11px 14px;display:none;align-items:center;justify-content:space-between;box-shadow:0 6px 24px rgba(255,27,109,0.4);z-index:50;cursor:pointer;}
+.cart-bar.show{display:flex;animation:slideUp 0.3s;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.cart-count{font-size:11px;font-weight:800;}
+.cart-total{font-size:13px;font-weight:900;font-family:var(--mono);}
+.cart-cta{font-size:11px;font-weight:800;display:flex;align-items:center;gap:5px;}
+
+/* PANELS */
+.panel{margin:0 14px 14px;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.panel-title{font-size:13.5px;font-weight:800;letter-spacing:-0.3px;margin-bottom:4px;}
+.panel-sub{font-size:10px;color:var(--text2);margin-bottom:10px;line-height:1.5;}
+
+/* FORMS */
+.form-group{margin-bottom:10px;}
+.form-label{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;display:block;}
+.form-input,.form-textarea,.form-select{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:11px 12px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;-webkit-user-select:text;user-select:text;}
+.form-textarea{min-height:70px;resize:vertical;}
+.form-input:focus,.form-textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,27,109,0.1);}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text4);}
+
+/* BUTTONS */
+.btn{padding:11px 16px;border-radius:10px;border:none;cursor:pointer;font-family:var(--sans);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform 0.18s;}
+.btn:active{transform:scale(0.97);}
+.btn-full{width:100%;margin-top:8px;}
+.btn-primary{background:linear-gradient(135deg,#FF1B6D,#EF4444);color:#fff;box-shadow:0 4px 14px rgba(255,27,109,0.25);}
+.btn-orange{background:linear-gradient(135deg,#FF7A1A,#F59E0B);color:#fff;box-shadow:0 4px 14px rgba(255,122,26,0.25);}
+.btn-blue{background:linear-gradient(135deg,#3B7BF6,#60A5FA);color:#fff;box-shadow:0 4px 14px rgba(59,123,246,0.25);}
+.btn-green{background:linear-gradient(135deg,#22C55E,#4ADE80);color:#fff;box-shadow:0 4px 14px rgba(34,197,94,0.25);}
+.btn-purple{background:linear-gradient(135deg,#A855F7,#C084FC);color:#fff;box-shadow:0 4px 14px rgba(168,85,247,0.25);}
+.btn-ghost{background:var(--s2);color:var(--text2);border:1px solid var(--border2);}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--bot-h) + 12px);left:12px;right:12px;background:var(--s2);border:1px solid rgba(34,197,94,0.3);border-radius:10px;padding:11px 14px;display:none;align-items:center;gap:10px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
+.toast.show{display:flex;animation:slideUp 0.3s;}
+.toast-text{font-size:11.5px;font-weight:600;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:flex-end;justify-content:center;z-index:1000;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--s1);border-top:1px solid var(--border2);border-radius:20px 20px 0 0;padding:22px 18px 28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:modalUp 0.32s cubic-bezier(0.22,1,0.36,1);}
+@keyframes modalUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--text4);margin:0 auto 16px;}
+.modal-title{font-size:17px;font-weight:900;letter-spacing:-0.4px;margin-bottom:5px;}
+.modal-sub{font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:14px;}
+
+/* SOS */
+.sos-arena{padding:18px 14px;display:flex;flex-direction:column;align-items:center;gap:12px;}
+.sos-outer{width:170px;height:170px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;}
+.sos-ring{position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(239,68,68,0.25);animation:sos-ring 2.5s ease-out infinite;}
+.sos-ring2{position:absolute;inset:-16px;border-radius:50%;border:1px solid rgba(239,68,68,0.12);animation:sos-ring 2.5s ease-out 0.5s infinite;}
+@keyframes sos-ring{0%{transform:scale(0.95);opacity:0.7;}100%{transform:scale(1.18);opacity:0;}}
+.sos-btn{width:150px;height:150px;border-radius:50%;background:linear-gradient(135deg,#FF1B6D 0%,#EF4444 55%,#DC2626 100%);color:#fff;border:none;cursor:pointer;box-shadow:0 0 0 5px rgba(239,68,68,0.15),0 10px 36px rgba(239,68,68,0.45);font-family:var(--sans);position:relative;z-index:5;touch-action:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.sos-btn:active{transform:scale(0.95);}
+.sos-btn.flash{animation:sos-flash 0.4s infinite;}
+@keyframes sos-flash{0%,100%{box-shadow:0 0 0 5px rgba(239,68,68,0.15),0 10px 36px rgba(239,68,68,0.45);}50%{box-shadow:0 0 0 18px rgba(239,68,68,0.3),0 10px 50px rgba(239,68,68,0.7);}}
+
+/* AI MONITORING / DETECTION */
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ai-metric{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;}
+.ai-metric-label{font-size:8.5px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.ai-metric-val{font-size:18px;font-weight:800;font-family:var(--mono);}
+.ai-metric-sub{font-size:8.5px;color:var(--text3);margin-top:2px;}
+.waveform{display:flex;align-items:center;gap:3px;height:26px;justify-content:center;margin-top:5px;}
+.wave-bar{width:3px;border-radius:2px;background:var(--purple);animation:wave 1s infinite;}
+@keyframes wave{0%,100%{height:4px;opacity:0.3;}50%{height:22px;opacity:1;}}
+.wave-bar:nth-child(2){animation-delay:0.1s;}.wave-bar:nth-child(3){animation-delay:0.2s;}.wave-bar:nth-child(4){animation-delay:0.3s;}.wave-bar:nth-child(5){animation-delay:0.4s;}.wave-bar:nth-child(6){animation-delay:0.5s;}.wave-bar:nth-child(7){animation-delay:0.6s;}.wave-bar:nth-child(8){animation-delay:0.7s;}
+
+/* COMPLAINT */
+.cat-pick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.cat-pick{background:var(--s2);border:1.5px solid var(--border2);border-radius:11px;padding:11px 5px;text-align:center;cursor:pointer;transition:all 0.18s;}
+.cat-pick:active{transform:scale(0.96);}
+.cat-pick.selected{border-color:var(--pink);background:var(--pink-dim);box-shadow:0 0 0 3px rgba(255,27,109,0.12);}
+.cat-pick-icon{font-size:21px;display:block;margin-bottom:3px;}
+.cat-pick-label{font-size:9.5px;font-weight:700;}
+.cat-pick-sub{font-size:8px;color:var(--text3);margin-top:1px;}
+
+.takeover-banner{background:linear-gradient(135deg,rgba(239,68,68,0.18),rgba(255,27,109,0.12));border:1.5px solid var(--red);border-radius:12px;padding:13px;margin:0 14px 14px;display:none;align-items:flex-start;gap:10px;animation:slideUp 0.4s;}
+.takeover-banner.show{display:flex;}
+.takeover-title{font-size:12px;font-weight:800;color:var(--red);margin-bottom:3px;letter-spacing:0.3px;}
+.takeover-body{font-size:10.5px;color:var(--text2);line-height:1.5;}
+.takeover-body strong{color:var(--text);}
+
+.complaint-card{background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:8px;}
+.cmp-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.cmp-cat{font-size:11px;font-weight:800;text-transform:capitalize;}
+.cmp-id{font-size:8.5px;color:var(--text3);font-family:var(--mono);font-weight:700;}
+.cmp-sev{font-size:8px;padding:2px 7px;border-radius:5px;font-weight:800;letter-spacing:0.4px;}
+.sev-low{background:var(--green-dim);color:var(--green);}
+.sev-medium{background:var(--amber-dim);color:var(--amber);}
+.sev-high{background:var(--red-dim);color:var(--red);}
+.sev-critical{background:rgba(239,68,68,0.25);color:#FF8888;}
+.cmp-desc{font-size:10px;color:var(--text2);line-height:1.5;margin-bottom:6px;font-style:italic;}
+.cmp-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}
+.meta-chip{font-size:8.5px;background:var(--s3);color:var(--text2);padding:2px 7px;border-radius:5px;font-weight:600;}
+.cmp-action{font-size:10px;color:var(--text2);padding:7px 9px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:7px;line-height:1.45;}
+.cmp-action strong{color:var(--green);}
+
+/* TRAIN TRACKING */
+.train-route-viz{padding:14px 8px;background:var(--s2);border-radius:12px;margin-top:10px;position:relative;}
+.train-stations{display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-bottom:6px;}
+.train-track{position:relative;height:6px;background:var(--s3);border-radius:3px;}
+.train-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,var(--orange),var(--pink));border-radius:3px;transition:width 1.2s cubic-bezier(0.22,1,0.36,1);}
+.train-loco{position:absolute;top:50%;transform:translate(-50%,-65%);font-size:22px;transition:left 1.2s cubic-bezier(0.22,1,0.36,1);filter:drop-shadow(0 0 6px rgba(255,122,26,0.7));z-index:2;}
+.train-stops{display:flex;justify-content:space-between;margin-top:6px;}
+.train-stop{flex:1;font-size:8.5px;font-weight:700;color:var(--text3);text-align:center;position:relative;}
+.train-stop-dot{width:6px;height:6px;background:var(--s3);border:2px solid var(--text4);border-radius:50%;margin:0 auto 3px;}
+.train-stop.passed .train-stop-dot{background:var(--orange);border-color:var(--orange);}
+.train-stop.current .train-stop-dot{background:var(--pink);border-color:var(--pink);width:9px;height:9px;animation:pulse 1.5s infinite;}
+.train-stop.current{color:var(--pink);}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,27,109,0.6);}50%{box-shadow:0 0 0 6px rgba(255,27,109,0);}}
+.train-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.train-info-cell{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:9px;}
+.train-info-label{font-size:8.5px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;}
+.train-info-val{font-size:14px;font-weight:800;}
+.coach-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.coach-lbl{font-size:9.5px;color:var(--text2);width:72px;font-weight:700;flex-shrink:0;}
+.coach-track{flex:1;height:6px;background:var(--s3);border-radius:3px;overflow:hidden;}
+.coach-fill{height:100%;border-radius:3px;transition:width 0.7s;}
+.coach-pct{font-size:9.5px;font-weight:800;width:32px;text-align:right;flex-shrink:0;}
+
+/* STATION HUB */
+.hub-item{display:flex;align-items:center;gap:11px;padding:9px 11px;background:var(--s2);border:1px solid var(--border);border-radius:9px;margin-bottom:6px;}
+.hub-item-icon{font-size:18px;flex-shrink:0;width:30px;text-align:center;}
+.hub-item-body{flex:1;min-width:0;}
+.hub-item-name{font-size:10.5px;font-weight:700;}
+.hub-item-val{font-size:10px;color:var(--text2);line-height:1.4;}
+
+/* HOME COOK CARD */
+.cook-card{flex:0 0 200px;background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--border2);border-radius:14px;padding:13px;cursor:pointer;position:relative;overflow:hidden;}
+.cook-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--pink));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;margin-bottom:6px;}
+.cook-kitchen{font-size:12px;font-weight:800;margin-bottom:2px;}
+.cook-by{font-size:9px;color:var(--text3);margin-bottom:5px;}
+.cook-cuisine{font-size:9px;color:var(--orange);font-weight:700;margin-bottom:5px;}
+.cook-stats{display:flex;gap:6px;font-size:8.5px;font-weight:700;}
+.cook-stat{padding:2px 6px;background:var(--s3);border-radius:5px;color:var(--text2);}
+.cook-stat.hi{background:var(--green-dim);color:var(--green);}
+
+/* AI CHAT */
+.chat-wrap{padding:0 14px 14px;}
+.chat-msg{display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;}
+.chat-msg.user{flex-direction:row-reverse;}
+.chat-bubble{padding:10px 13px;border-radius:14px;max-width:78%;font-size:11.5px;line-height:1.5;}
+.chat-msg.ai .chat-bubble{background:var(--s2);border:1px solid var(--border);border-bottom-left-radius:4px;}
+.chat-msg.user .chat-bubble{background:linear-gradient(135deg,var(--pink),var(--orange));color:#fff;border-bottom-right-radius:4px;}
+.chat-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.chat-msg.ai .chat-avatar{background:linear-gradient(135deg,var(--purple),var(--blue));}
+.chat-msg.user .chat-avatar{background:linear-gradient(135deg,var(--pink),var(--orange));}
+.chat-input-bar{position:sticky;bottom:0;display:flex;gap:8px;padding:10px;background:rgba(7,9,18,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);}
+.chat-input{flex:1;background:var(--s2);border:1px solid var(--border2);border-radius:22px;padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;-webkit-user-select:text;user-select:text;}
+.chat-send{width:38px;height:38px;background:linear-gradient(135deg,var(--pink),var(--orange));border:none;border-radius:50%;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.chat-suggest{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 8px;}
+.chat-suggest-chip{font-size:10px;background:var(--s2);border:1px solid var(--border2);padding:5px 10px;border-radius:999px;color:var(--text2);cursor:pointer;}
+.chat-suggest-chip:hover{border-color:var(--pink);color:var(--pink);}
+
+/* HOTEL CARD */
+.hotel-card{background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:8px;}
+.hotel-name{font-size:12.5px;font-weight:800;}
+.hotel-dist{font-size:9.5px;color:var(--text3);margin-top:2px;}
+.hotel-price{font-size:12px;font-weight:800;color:var(--orange);}
+.hotel-stars{font-size:10.5px;margin-bottom:2px;}
+.hotel-desc{font-size:10px;color:var(--text2);line-height:1.5;margin:6px 0;}
+.s-tag{font-size:8px;background:var(--green-dim);color:var(--green);padding:2px 6px;border-radius:4px;font-weight:700;margin-right:4px;}
+
+/* PERMISSION & KYC MODAL ROWS */
+.perm-row,.opt-row{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:10px;background:var(--s2);margin-bottom:6px;cursor:pointer;}
+.perm-icon{font-size:18px;}
+.perm-info{flex:1;}
+.perm-name{font-size:11px;font-weight:700;}
+.perm-desc{font-size:9px;color:var(--text3);margin-top:1px;}
+.perm-toggle{width:19px;height:19px;border-radius:5px;border:2px solid var(--border2);background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:11px;}
+.perm-toggle.on{background:var(--pink);border-color:var(--pink);color:#fff;}
+
+/* SPINNER */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(168,85,247,0.25);border-top-color:var(--purple);border-radius:50%;animation:spin 0.75s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TABS */
+.tabs-row{display:flex;background:var(--s2);border-radius:10px;padding:3px;margin:0 14px 14px;}
+.tab-btn{flex:1;padding:8px;background:transparent;border:none;color:var(--text2);font-family:var(--sans);font-size:11px;font-weight:700;cursor:pointer;border-radius:7px;transition:all 0.18s;}
+.tab-btn.active{background:var(--pink);color:#fff;box-shadow:0 4px 12px rgba(255,27,109,0.3);}
+
+/* ADMIN */
+.admin-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0 14px 12px;}
+.admin-stat{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:11px;text-align:center;}
+.admin-stat-v{font-size:22px;font-weight:900;font-family:var(--mono);}
+.admin-stat-k{font-size:8.5px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+.cmp-status-btns{display:flex;gap:5px;margin-top:7px;}
+.cmp-status-btn{flex:1;padding:6px;font-size:9px;font-weight:700;border:1px solid var(--border2);background:var(--s2);color:var(--text2);border-radius:5px;cursor:pointer;font-family:var(--sans);}
+.cmp-status-btn:hover{border-color:var(--pink);color:var(--pink);}
+.sms-row{padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:7px;margin-bottom:5px;font-size:9.5px;}
+.sms-rcp{color:var(--blue2);font-weight:700;margin-bottom:2px;font-family:var(--mono);font-size:9px;}
+
+/* ORDER TRACK */
+.order-track{padding:14px;background:var(--s2);border-radius:12px;margin:0 14px 14px;}
+.order-stages{display:flex;justify-content:space-between;margin:14px 0 8px;position:relative;}
+.order-stages::before{content:'';position:absolute;top:11px;left:8%;right:8%;height:2px;background:var(--s3);}
+.order-stages-fill{position:absolute;top:11px;left:8%;height:2px;background:linear-gradient(90deg,var(--orange),var(--pink));transition:width 1s;}
+.order-stage{display:flex;flex-direction:column;align-items:center;font-size:8.5px;color:var(--text3);font-weight:700;position:relative;z-index:1;flex:1;}
+.order-stage-icon{width:24px;height:24px;border-radius:50%;background:var(--s3);border:2px solid var(--text4);display:flex;align-items:center;justify-content:center;font-size:12px;margin-bottom:3px;}
+.order-stage.done .order-stage-icon{background:var(--orange);border-color:var(--orange);}
+.order-stage.active .order-stage-icon{background:var(--pink);border-color:var(--pink);animation:pulse 1.5s infinite;}
+.order-stage.done,.order-stage.active{color:var(--text);}
+
+/* RESPONSIVE */
+@media(max-width:380px){
+  .quick-grid{grid-template-columns:repeat(4,1fr);}
+  .cat-pick-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="nav" data-testid="top-nav">
+  <div class="brand" onclick="showPage('home')" data-testid="brand">
+    <div class="brand-icon">🚂</div>
+    <div><div class="brand-name">Yatra Sathi</div><div class="brand-tag">SMART RAIL COMPANION</div></div>
+  </div>
+  <div id="userBar" class="user-bar" onclick="showPage('admin')" data-testid="user-bar" style="display:none;">
+    <div class="user-avatar-sm" id="userAvatar">U</div>
+    <div><div class="user-bar-name" id="userBarName">User</div><div class="user-bar-verify">✓ KYC</div></div>
+  </div>
+  <div id="livePill" class="live-pill"><span class="live-dot"></span>LIVE</div>
+</nav>
+
+<div class="pages">
+
+<!-- ═══ HOME ═══ -->
+<div class="page active" id="page-home">
+  <div class="search-bar" onclick="showPage('chat')" data-testid="home-search">
+    <span class="search-bar-icon">🔍</span>
+    <span class="search-bar-text">Ask Yatra AI · "12951 status", "food at Bhopal"…</span>
+    <span class="search-bar-mic">🎤 AI</span>
+  </div>
+
+  <div class="hero-banner gradient-1" onclick="showPage('food')" data-testid="banner-food">
+    <span class="hero-banner-art">🍱</span>
+    <div class="hero-pretitle">⚡ NEW</div>
+    <div class="hero-title">Food On Journey</div>
+    <div class="hero-subtitle">IRCTC · Zomato · Home cooks — delivered to your seat</div>
+    <span class="hero-cta">Order Now ›</span>
+  </div>
+
+  <div class="quick-grid">
+    <div class="quick-cell" onclick="showPage('food')" data-testid="quick-food"><span class="quick-icon">🍱</span><div class="quick-label">Food</div></div>
+    <div class="quick-cell" onclick="showPage('home-foods')" data-testid="quick-homefood"><span class="quick-icon">🏠</span><div class="quick-label">Home<br/>Foods</div></div>
+    <div class="quick-cell" onclick="showPage('trains')" data-testid="quick-livetrain"><span class="quick-icon">🚂</span><div class="quick-label">Live<br/>Train</div></div>
+    <div class="quick-cell" onclick="showPage('pnr')" data-testid="quick-pnr"><span class="quick-icon">🎫</span><div class="quick-label">PNR<br/>Status</div></div>
+    <div class="quick-cell" onclick="showPage('station-hub')" data-testid="quick-station"><span class="quick-icon">🚉</span><div class="quick-label">Station<br/>Hub</div></div>
+    <div class="quick-cell" onclick="showPage('chat')" data-testid="quick-yatra-ai"><span class="quick-icon">🤖</span><div class="quick-label">Yatra<br/>AI</div></div>
+    <div class="quick-cell" onclick="showPage('hotels')" data-testid="quick-hotels"><span class="quick-icon">🏨</span><div class="quick-label">Hotels</div></div>
+    <div class="quick-cell" onclick="showPage('safety')" data-testid="quick-sos" style="background:linear-gradient(135deg,var(--red-dim),var(--pink-dim));border-color:rgba(239,68,68,0.3);"><span class="quick-icon">🆘</span><div class="quick-label" style="color:var(--red);">SOS</div></div>
+  </div>
+
+  <div class="hero-banner gradient-3" onclick="showPage('home-foods')" data-testid="banner-home-foods">
+    <span class="hero-banner-art">👩‍🍳</span>
+    <div class="hero-pretitle">EARN ₹15,000+/MO</div>
+    <div class="hero-title">Rail Home Foods</div>
+    <div class="hero-subtitle">Cook from home · Sell to railway passengers · Built-in customers</div>
+    <span class="hero-cta">Become a Cook ›</span>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><div class="section-title">🔥 Trending Near You</div><span class="section-link" onclick="showPage('food')">See all</span></div>
+    <div class="h-scroll" id="trendingScroll"><div style="padding:8px;font-size:10px;color:var(--text3);">Loading...</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><div class="section-title">👩‍🍳 Home Kitchens</div><span class="section-link" onclick="showPage('home-foods')">See all</span></div>
+    <div class="h-scroll" id="cooksScroll"><div style="padding:8px;font-size:10px;color:var(--text3);">Loading...</div></div>
+  </div>
+
+  <div class="hero-banner gradient-2" onclick="showPage('chat')" data-testid="banner-yatra-ai">
+    <span class="hero-banner-art">🤖</span>
+    <div class="hero-pretitle">🇮🇳 INDIA'S FIRST</div>
+    <div class="hero-title">Meet Yatra AI</div>
+    <div class="hero-subtitle">Voice-aware travel assistant for PNR, food, delays, safety</div>
+    <span class="hero-cta">Chat Now ›</span>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><div class="section-title">⭐ More Features</div></div>
+    <div class="quick-grid" style="padding:0 14px;">
+      <div class="quick-cell" onclick="showPage('detect')"><span class="quick-icon">🛡️</span><div class="quick-label">AI<br/>Safety</div></div>
+      <div class="quick-cell" onclick="showPage('crowd')"><span class="quick-icon">🌡️</span><div class="quick-label">Crowd<br/>Heat</div></div>
+      <div class="quick-cell" onclick="showPage('complaints')"><span class="quick-icon">📣</span><div class="quick-label">Report<br/>Issue</div></div>
+      <div class="quick-cell" onclick="showPage('admin')" style="background:linear-gradient(135deg,var(--purple-dim),var(--blue-dim));"><span class="quick-icon">🔐</span><div class="quick-label">Admin<br/>Portal</div></div>
+    </div>
+  </div>
+
+  <div style="padding:0 14px;font-size:9.5px;color:var(--text3);text-align:center;margin-top:18px;line-height:1.7;">
+    Yatra Sathi v2.0 · For All Passengers · Built in 🇮🇳 with care for women, seniors, families & travellers.
+  </div>
+</div>
+
+<!-- ═══ FOOD ═══ -->
+<div class="page" id="page-food">
+  <div class="search-bar" data-testid="food-search-bar"><span class="search-bar-icon">📍</span><input class="form-input" id="foodStation" placeholder="Station code (NDLS, CSTM, BPL, HWH)" style="background:transparent;border:none;padding:0;font-size:11.5px;flex:1;" data-testid="food-station-input"/><button class="search-bar-mic" onclick="loadFood()" style="border:none;cursor:pointer;font-family:var(--sans);" data-testid="food-search-btn">Search</button></div>
+
+  <div class="chips-row" id="foodChips">
+    <button class="chip active" onclick="setFoodFilter('all',this)" data-testid="food-all">🍽 All</button>
+    <button class="chip" onclick="setFoodFilter('veg',this)" data-testid="food-veg"><span class="veg-dot"></span>Veg Only</button>
+    <button class="chip" onclick="setFoodFilter('nonveg',this)" data-testid="food-nonveg"><span class="nonveg-dot"></span>Non-Veg</button>
+    <button class="chip" onclick="setFoodFilter('healthy',this)">🥗 Healthy</button>
+    <button class="chip" onclick="setFoodFilter('diabetic',this)">💉 Diabetic</button>
+    <button class="chip" onclick="setFoodFilter('senior',this)">👴 Senior</button>
+    <button class="chip" onclick="setFoodFilter('baby',this)">🍼 Baby</button>
+    <button class="chip" onclick="setFoodFilter('combo',this)">👨‍👩‍👧 Family Combo</button>
+  </div>
+
+  <div id="foodAiTip" style="margin:0 14px 14px;padding:11px 13px;background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(255,27,109,0.06));border:1px solid rgba(168,85,247,0.25);border-radius:11px;font-size:10.5px;color:var(--text2);line-height:1.55;display:none;">
+    <strong style="color:var(--purple);">🤖 Yatra AI:</strong> <span id="foodAiTipText"></span>
+  </div>
+
+  <div id="foodSections"></div>
+</div>
+
+<!-- ═══ HOME FOODS ═══ -->
+<div class="page" id="page-home-foods">
+  <div style="padding:18px 14px 4px;">
+    <div style="font-size:9px;font-weight:800;color:var(--purple);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">🌟 Self Employment</div>
+    <h1 style="font-size:26px;font-weight:900;letter-spacing:-0.7px;line-height:1.1;background:linear-gradient(135deg,#22C55E,#14B8A6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Rail Home<br/>Foods</h1>
+    <p style="font-size:11.5px;color:var(--text2);line-height:1.55;margin-top:6px;">Homemade food by housewives, home cooks, rural entrepreneurs — for railway passengers</p>
+  </div>
+
+  <div class="tabs-row" data-testid="home-foods-tabs">
+    <button class="tab-btn active" onclick="setHomeFoodTab('customer',this)" data-testid="tab-customer">🛒 Order Food</button>
+    <button class="tab-btn" onclick="setHomeFoodTab('cook',this)" data-testid="tab-cook">👩‍🍳 Become a Cook</button>
+  </div>
+
+  <div id="hf-customer">
+    <div class="search-bar"><span class="search-bar-icon">🚉</span><input class="form-input" id="hfStation" placeholder="Station (QLN, LKO, PNBE, MDU…)" style="background:transparent;border:none;padding:0;font-size:11.5px;flex:1;" data-testid="hf-station-input"/><button class="search-bar-mic" onclick="loadCooks()" style="border:none;font-family:var(--sans);cursor:pointer;" data-testid="hf-search">Search</button></div>
+    <div id="cooksList"><div style="padding:20px;text-align:center;color:var(--text3);font-size:11px;"><span class="spinner"></span> Loading kitchens…</div></div>
+  </div>
+
+  <div id="hf-cook" style="display:none;">
+    <div class="panel">
+      <div class="panel-title">🍳 Register Your Kitchen</div>
+      <div class="panel-sub">Join 12,400+ home cooks earning ₹8K – ₹50K/month from railway passengers.</div>
+      <div class="form-group"><label class="form-label">Your Name</label><input class="form-input" id="cookName" placeholder="e.g. Lakshmi Amma" data-testid="cook-name"/></div>
+      <div class="form-group"><label class="form-label">10-digit Phone</label><input class="form-input" id="cookPhone" maxlength="10" type="tel" placeholder="98xxxxxxxx" data-testid="cook-phone"/></div>
+      <div class="form-group"><label class="form-label">Kitchen Name</label><input class="form-input" id="cookKitchen" placeholder="e.g. Amma's Kitchen" data-testid="cook-kitchen"/></div>
+      <div style="display:flex;gap:8px;">
+        <div class="form-group" style="flex:1;"><label class="form-label">City</label><input class="form-input" id="cookCity" placeholder="Kollam" data-testid="cook-city"/></div>
+        <div class="form-group" style="flex:1;"><label class="form-label">Station Hub</label><input class="form-input" id="cookStation" placeholder="QLN" maxlength="5" data-testid="cook-station"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Cuisine (comma separated)</label><input class="form-input" id="cookCuisine" placeholder="Kerala, South Indian" data-testid="cook-cuisine"/></div>
+      <div style="display:flex;gap:8px;">
+        <div class="form-group" style="flex:1;"><label class="form-label">Daily Capacity</label><input class="form-input" id="cookCapacity" type="number" placeholder="30" data-testid="cook-capacity"/></div>
+        <div class="form-group" style="flex:1;"><label class="form-label">Radius (km)</label><input class="form-input" id="cookRadius" type="number" placeholder="5" data-testid="cook-radius"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Specialties</label><input class="form-input" id="cookSpec" placeholder="Sadya, Puttu, Appam" data-testid="cook-spec"/></div>
+      <button class="btn btn-green btn-full" onclick="registerCook(event)" data-testid="cook-register">🚀 Register & Start Earning</button>
+    </div>
+
+    <div id="cookInsightsBox" style="display:none;" class="panel">
+      <div class="panel-title">📈 Your AI Sales Insights</div>
+      <div id="cookInsightsContent" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="panel" style="background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(20,184,166,0.05));border-color:rgba(34,197,94,0.2);">
+      <div class="panel-title">💡 Why join Rail Home Foods?</div>
+      <div style="margin-top:8px;font-size:10.5px;color:var(--text2);line-height:1.8;">
+        ✅ <strong style="color:var(--green);">Earn ₹8K – ₹50K/month</strong> from your kitchen<br/>
+        ✅ <strong style="color:var(--green);">Built-in customers</strong> — 100s of trains daily<br/>
+        ✅ <strong style="color:var(--green);">AI Sales Coach</strong> — what to cook, when, how much<br/>
+        ✅ <strong style="color:var(--green);">Hygiene certification</strong> — boosts price by 40%<br/>
+        ✅ <strong style="color:var(--green);">Pre-orders</strong> — no waste, predictable income
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LIVE TRAINS ═══ -->
+<div class="page" id="page-trains">
+  <div style="padding:16px 14px 6px;">
+    <div style="font-size:9px;font-weight:800;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;">📡 Live Tracking</div>
+    <h1 style="font-size:26px;font-weight:900;letter-spacing:-0.7px;margin-top:4px;">Track Your Train</h1>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Enter Train Number</div>
+    <div class="form-group" style="margin-bottom:0;">
+      <input class="form-input" id="trainInput" type="number" placeholder="e.g. 12951, 12309" data-testid="train-input"/>
+      <button class="btn btn-orange btn-full" onclick="trackTrain()" data-testid="track-btn">📡 Track Live</button>
+    </div>
+  </div>
+  <div id="trainResult"></div>
+</div>
+
+<!-- ═══ PNR ═══ -->
+<div class="page" id="page-pnr">
+  <div style="padding:16px 14px 6px;">
+    <div style="font-size:9px;font-weight:800;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase;">🎫 PNR Status</div>
+    <h1 style="font-size:26px;font-weight:900;letter-spacing:-0.7px;margin-top:4px;">Check Booking</h1>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Enter 10-digit PNR</div>
+    <div class="form-group" style="margin-bottom:0;">
+      <input class="form-input" id="pnrInput" type="number" placeholder="e.g. 1234567890" maxlength="10" data-testid="pnr-input"/>
+      <button class="btn btn-blue btn-full" onclick="checkPNR()" data-testid="pnr-check">🔍 Check Status</button>
+    </div>
+  </div>
+  <div id="pnrResult"></div>
+</div>
+
+<!-- ═══ STATION HUB ═══ -->
+<div class="page" id="page-station-hub">
+  <div style="padding:16px 14px 6px;">
+    <div style="font-size:9px;font-weight:800;color:var(--teal);letter-spacing:1.5px;text-transform:uppercase;">🚉 Station Intelligence</div>
+    <h1 style="font-size:26px;font-weight:900;letter-spacing:-0.7px;margin-top:4px;">Station Hub</h1>
+    <p style="font-size:11px;color:var(--text2);margin-top:5px;">Everything about your station — buses, metro, parking, food, safety routes</p>
+  </div>
+  <div class="search-bar"><span class="search-bar-icon">🔍</span><input class="form-input" id="hubInput" placeholder="Station code (NDLS, CSTM, HWH, MAS…)" style="background:transparent;border:none;padding:0;font-size:11.5px;flex:1;" data-testid="hub-input"/><button class="search-bar-mic" onclick="loadHub()" style="border:none;font-family:var(--sans);cursor:pointer;" data-testid="hub-search">Search</button></div>
+  <div id="hubResult"></div>
+</div>
+
+<!-- ═══ YATRA AI CHAT ═══ -->
+<div class="page" id="page-chat">
+  <div style="padding:14px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(168,85,247,0.05),rgba(59,123,246,0.03));">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:18px;">🤖</div>
+      <div><div style="font-size:14px;font-weight:800;">Yatra AI</div><div style="font-size:9px;color:var(--green);font-weight:700;">● Online · India-focused · 22 languages</div></div>
+    </div>
+  </div>
+  <div class="chat-suggest" id="chatSuggest" style="margin-top:10px;">
+    <span class="chat-suggest-chip" onclick="sendChat('Check PNR 1234567890')" data-testid="chip-pnr">🎫 Check PNR</span>
+    <span class="chat-suggest-chip" onclick="sendChat('Is train 12951 on time?')" data-testid="chip-train">🚂 Train status</span>
+    <span class="chat-suggest-chip" onclick="sendChat('Best food at Bhopal station?')" data-testid="chip-food">🍱 Food</span>
+    <span class="chat-suggest-chip" onclick="sendChat('How to stay safe on night journey?')" data-testid="chip-safety">🛡️ Safety</span>
+    <span class="chat-suggest-chip" onclick="sendChat('Hotels near Delhi station')" data-testid="chip-hotel">🏨 Hotels</span>
+  </div>
+  <div class="chat-wrap" id="chatLog" data-testid="chat-log">
+    <div class="chat-msg ai">
+      <div class="chat-avatar">🤖</div>
+      <div class="chat-bubble">Namaste! 👋 I'm Yatra AI. Ask me about your PNR, train delays, station food, hotels, safety — anything about your railway journey.</div>
+    </div>
+  </div>
+  <div class="chat-input-bar">
+    <input class="chat-input" id="chatInput" placeholder="Type or speak…" onkeydown="if(event.key==='Enter')sendChat()" data-testid="chat-input"/>
+    <button class="chat-send" onclick="sendChat()" data-testid="chat-send">➤</button>
+  </div>
+</div>
+
+<!-- ═══ SOS ═══ -->
+<div class="page" id="page-safety">
+  <div style="padding:18px 14px 6px;">
+    <div style="font-size:9px;font-weight:800;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;">🚨 Emergency</div>
+    <h1 style="font-size:26px;font-weight:900;letter-spacing:-0.7px;margin-top:4px;color:var(--red);">One Tap Alert</h1>
+    <p style="font-size:11px;color:var(--text2);margin-top:5px;">Hold 3 seconds. Alerts RPF, family & police with your live location.</p>
+  </div>
+  <div class="sos-arena">
+    <div class="sos-outer"><div class="sos-ring"></div><div class="sos-ring2"></div>
+      <button class="sos-btn" id="sosBtn" data-testid="sos-btn" onmousedown="startSOS()" onmouseup="cancelSOS()" onmouseleave="cancelSOS()" ontouchstart="startSOS(event)" ontouchend="cancelSOS()">
+        <span style="font-size:32px;">🆘</span><span style="font-size:10px;font-weight:700;opacity:0.85;">HOLD 3 SEC</span>
+      </button>
+    </div>
+    <div><div id="sosStatus" style="font-size:13px;font-weight:700;color:var(--text2);">Press and hold to activate</div><div id="sosTimer" style="font-size:22px;font-weight:900;font-family:var(--mono);color:var(--red);margin-top:4px;display:none;"></div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">⚡ When SOS Activates</div>
+    <div style="margin-top:8px;font-size:10.5px;color:var(--text2);line-height:1.8;">
+      📍 <strong>Live GPS</strong> sent to RPF Command Center<br/>
+      📞 <strong>Trusted contacts</strong> get SMS with location<br/>
+      🎙️ <strong>Audio + photo</strong> recorded as evidence<br/>
+      📡 <strong>Coach & seat broadcast</strong> on emergency network
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AI DETECT ═══ -->
+<div class="page" id="page-detect">
+  <div style="padding:16px 14px 6px;">
+    <div style="font-size:9px;font-weight:800;color:var(--purple);letter-spacing:1.5px;text-transform:uppercase;">🤖 AI Engine</div>
+    <h1 style="font-size:26px;font-weight:900;letter-spacing:-0.7px;margin-top:4px;">Live Safety AI</h1>
+  </div>
+  <div class="panel">
+    <div class="panel-title">📊 Live Monitoring</div>
+    <div class="ai-grid" style="margin-top:10px;">
+      <div class="ai-metric" style="background:rgba(34,197,94,0.06);"><div class="ai-metric-label">Mic</div><div class="ai-metric-val" id="micStatus" style="color:var(--green);">✓ ON</div><div class="waveform"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div></div>
+      <div class="ai-metric" style="background:rgba(168,85,247,0.06);"><div class="ai-metric-label">Camera</div><div class="ai-metric-val" style="color:var(--purple);">STANDBY</div><div class="ai-metric-sub">On SOS</div></div>
+      <div class="ai-metric"><div class="ai-metric-label">Sound</div><div class="ai-metric-val" id="aiSoundDb" style="color:var(--orange);">72 dB</div><div class="ai-metric-sub">Alert at 85+</div></div>
+      <div class="ai-metric"><div class="ai-metric-label">Motion</div><div class="ai-metric-val" id="aiMotion" style="color:var(--green);">Normal</div><div class="ai-metric-sub">Steady</div></div>
+      <div class="ai-metric"><div class="ai-metric-label">Location</div><div class="ai-metric-val" id="aiLocation" style="color:var(--green);">On Track</div></div>
+      <div class="ai-metric"><div class="ai-metric-label">Stress</div><div class="ai-metric-val" id="aiStress" style="color:var(--green);">Calm</div></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">🚨 Auto-Alert Triggers</div>
+    <div style="margin-top:10px;font-size:10.5px;color:var(--text2);line-height:1.85;">
+      🔊 <strong>Shouting Detection</strong> — Loud sounds > 85 dB<br/>
+      📳 <strong>Unusual Motion</strong> — Sudden movement change<br/>
+      🧹 <strong>Cleanliness AI</strong> — Toilet sensor auto-flag<br/>
+      🚬 <strong>Smoke Sensor</strong> — Bathroom triggers RPF takeover<br/>
+      ⏰ <strong>3-hour Immobility</strong> — Wellness check
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CROWD ═══ -->
+<div class="page" id="page-crowd">
+  <div style="padding:16px 14px 6px;">
+    <div style="font-size:9px;font-weight:800;color:var(--amber);letter-spacing:1.5px;text-transform:uppercase;">🌡️ Live Intel</div>
+    <h1 style="font-size:26px;font-weight:900;letter-spacing:-0.7px;margin-top:4px;">Crowd Heat</h1>
+  </div>
+  <div style="padding:0 14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;"><span style="font-size:11px;font-weight:700;">Stations & Terminals</span><span id="heatUpdateTime" style="font-size:9px;color:var(--green);font-family:var(--mono);">Live</span></div>
+    <div id="heatmapGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px;"></div>
+  </div>
+</div>
+
+<!-- ═══ COMPLAINTS ═══ -->
+<div class="page" id="page-complaints">
+  <div style="padding:16px 14px 6px;">
+    <div style="font-size:9px;font-weight:800;color:var(--pink);letter-spacing:1.5px;text-transform:uppercase;">📣 Auto-Takeover</div>
+    <h1 style="font-size:26px;font-weight:900;letter-spacing:-0.7px;margin-top:4px;">Report &<br/>Resolve</h1>
+    <p style="font-size:11px;color:var(--text2);margin-top:5px;">AI auto-routes to RPF / IRCTC / TTE / Pantry within seconds.</p>
+  </div>
+  <div class="takeover-banner" id="takeoverBanner"><div style="font-size:22px;">🚨</div><div><div class="takeover-title" id="takeoverTitle"></div><div class="takeover-body" id="takeoverBody"></div></div></div>
+  <div class="panel">
+    <div class="panel-title">⚡ File a Complaint</div>
+    <div class="cat-pick-grid">
+      <div class="cat-pick" data-cat="cleanliness" onclick="pickCat(this)" data-testid="cat-cleanliness"><span class="cat-pick-icon">🧹</span><div class="cat-pick-label">Cleanliness</div><div class="cat-pick-sub">Toilet/Coach</div></div>
+      <div class="cat-pick" data-cat="alcohol" onclick="pickCat(this)" data-testid="cat-alcohol"><span class="cat-pick-icon">🍺</span><div class="cat-pick-label">Alcohol</div><div class="cat-pick-sub">Drinking</div></div>
+      <div class="cat-pick" data-cat="smoking" onclick="pickCat(this)" data-testid="cat-smoking"><span class="cat-pick-icon">🚬</span><div class="cat-pick-label">Smoking</div><div class="cat-pick-sub">Bathroom</div></div>
+      <div class="cat-pick" data-cat="food" onclick="pickCat(this)" data-testid="cat-food"><span class="cat-pick-icon">🍱</span><div class="cat-pick-label">Food</div><div class="cat-pick-sub">Pantry</div></div>
+      <div class="cat-pick" data-cat="beggars" onclick="pickCat(this)" data-testid="cat-beggars"><span class="cat-pick-icon">🚫</span><div class="cat-pick-label">Beggars</div><div class="cat-pick-sub">Vendors</div></div>
+      <div class="cat-pick" data-cat="other" onclick="pickCat(this)" data-testid="cat-other"><span class="cat-pick-icon">📝</span><div class="cat-pick-label">Other</div><div class="cat-pick-sub">Any</div></div>
+    </div>
+    <div class="form-group"><label class="form-label">Train No</label><input class="form-input" id="cmpTrainNo" placeholder="e.g. 12951" data-testid="cmp-train"/></div>
+    <div style="display:flex;gap:7px;">
+      <div class="form-group" style="flex:1;"><label class="form-label">Coach</label><input class="form-input" id="cmpCoach" placeholder="S5, B1" data-testid="cmp-coach"/></div>
+      <div class="form-group" style="flex:1;"><label class="form-label">Station</label><input class="form-input" id="cmpStation" placeholder="Bhopal" data-testid="cmp-station"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">What happened?</label><textarea class="form-textarea" id="cmpDesc" placeholder="Describe in detail…" data-testid="cmp-desc"></textarea></div>
+    <button class="btn btn-primary btn-full" onclick="submitComplaint(event)" data-testid="cmp-submit">⚡ Submit & Alert Authority</button>
+  </div>
+  <div class="panel">
+    <div class="panel-title">📋 Recent Complaints</div>
+    <div id="complaintsList"><div style="padding:14px;text-align:center;color:var(--text3);font-size:11px;"><span class="spinner"></span> Loading…</div></div>
+  </div>
+</div>
+
+<!-- ═══ HOTELS ═══ -->
+<div class="page" id="page-hotels">
+  <div style="padding:16px 14px 6px;">
+    <div style="font-size:9px;font-weight:800;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;">🏨 Verified Stays</div>
+    <h1 style="font-size:26px;font-weight:900;letter-spacing:-0.7px;margin-top:4px;">Safe Hotels</h1>
+  </div>
+  <div class="search-bar"><span class="search-bar-icon">📍</span><input class="form-input" id="hotelCity" placeholder="Mumbai, Delhi, Kollam, Kochi…" style="background:transparent;border:none;padding:0;font-size:11.5px;flex:1;" data-testid="hotel-city"/><button class="search-bar-mic" onclick="searchHotels()" style="border:none;font-family:var(--sans);cursor:pointer;" data-testid="hotel-search">Search</button></div>
+  <div id="hotelsContainer" style="padding:0 14px;"></div>
+</div>
+
+<!-- ═══ ADMIN ═══ -->
+<div class="page" id="page-admin">
+  <div style="padding:16px 14px 6px;">
+    <div style="font-size:9px;font-weight:800;color:var(--purple);letter-spacing:1.5px;text-transform:uppercase;">🔐 Authority Portal</div>
+    <h1 style="font-size:26px;font-weight:900;letter-spacing:-0.7px;margin-top:4px;">Admin Console</h1>
+  </div>
+  <div id="adminLogin" class="panel">
+    <div class="panel-title">🔒 Enter Admin PIN</div>
+    <div class="panel-sub">Demo PIN: <strong style="color:var(--pink);font-family:var(--mono);">1234</strong></div>
+    <input class="form-input" id="adminPin" type="password" placeholder="PIN" maxlength="6" data-testid="admin-pin"/>
+    <button class="btn btn-purple btn-full" onclick="adminLogin()" data-testid="admin-login">🔓 Unlock</button>
+  </div>
+  <div id="adminContent" style="display:none;">
+    <div class="admin-stats">
+      <div class="admin-stat"><div class="admin-stat-v" id="adsTotal" style="color:var(--pink);">0</div><div class="admin-stat-k">Total</div></div>
+      <div class="admin-stat"><div class="admin-stat-v" id="adsOpen" style="color:var(--red);">0</div><div class="admin-stat-k">Open</div></div>
+      <div class="admin-stat"><div class="admin-stat-v" id="adsAck" style="color:var(--amber);">0</div><div class="admin-stat-k">Acknowledged</div></div>
+      <div class="admin-stat"><div class="admin-stat-v" id="adsRes" style="color:var(--green);">0</div><div class="admin-stat-k">Resolved</div></div>
+    </div>
+    <div class="panel"><div class="panel-title">📨 SMS Dispatch Log</div><div id="smsLogList" style="margin-top:8px;"></div></div>
+    <div class="panel"><div class="panel-title">📋 All Complaints</div><div id="adminComplaintsList" style="margin-top:8px;"></div></div>
+  </div>
+</div>
+
+</div>
+
+<!-- BOTTOM NAV — Flipkart style 5 buttons -->
+<div class="bottom-nav" data-testid="bottom-nav">
+  <button class="nav-btn active" onclick="showPage('home')" data-testid="nav-home"><span class="nav-icon">🏠</span>Home</button>
+  <button class="nav-btn" onclick="showPage('food')" data-testid="nav-food"><span class="nav-icon">🍱</span>Food</button>
+  <button class="nav-btn" onclick="showPage('chat')" data-testid="nav-chat"><span class="nav-icon">🤖</span>Yatra AI</button>
+  <button class="nav-btn" onclick="showPage('trains')" data-testid="nav-trains"><span class="nav-icon">🚂</span>Trains</button>
+  <button class="nav-btn sos-nav" onclick="showPage('safety')" data-testid="nav-sos"><span class="nav-icon">🆘</span>SOS</button>
+</div>
+</div>
+
+<!-- CART BAR -->
+<div class="cart-bar" id="cartBar" onclick="openCart()" data-testid="cart-bar">
+  <div><div class="cart-count" id="cartCount">0 items</div><div class="cart-total" id="cartTotal">₹0</div></div>
+  <div class="cart-cta">Checkout ›</div>
+</div>
+
+<!-- KYC MODAL -->
+<div class="modal-overlay" id="kycModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🪪 Quick KYC Verification</div>
+    <div class="modal-sub">Required by Indian Railways for food orders, SOS & complaints. 100% encrypted.</div>
+    <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="kycName" placeholder="Priya Sharma" data-testid="kyc-name"/></div>
+    <div class="form-group"><label class="form-label">10-Digit Mobile</label><input class="form-input" id="kycPhone" type="tel" maxlength="10" placeholder="98xxxxxxxx" data-testid="kyc-phone"/></div>
+    <div class="form-group"><label class="form-label">Last 4 of Aadhaar</label><input class="form-input" id="kycAadhaar" type="tel" maxlength="4" placeholder="****" data-testid="kyc-aadhaar"/></div>
+    <div class="form-group"><label class="form-label">Email (optional)</label><input class="form-input" id="kycEmail" type="email" placeholder="you@x.com" data-testid="kyc-email"/></div>
+    <button class="btn btn-primary btn-full" onclick="submitKYC()" data-testid="kyc-submit">✓ Verify & Continue</button>
+    <button class="btn btn-ghost btn-full" onclick="skipKYC()" data-testid="kyc-skip">Skip</button>
+  </div>
+</div>
+
+<!-- PERM MODAL -->
+<div class="modal-overlay" id="permModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📱 Keep You Safe</div>
+    <div class="modal-sub">Permissions stay on your device.</div>
+    <div onclick="togglePerm('loc')" class="perm-row"><div class="perm-icon">📍</div><div class="perm-info"><div class="perm-name">Location</div><div class="perm-desc">Track & SOS</div></div><div class="perm-toggle on" id="tog-loc">✓</div></div>
+    <div onclick="togglePerm('mic')" class="perm-row"><div class="perm-icon">🎤</div><div class="perm-info"><div class="perm-name">Microphone</div><div class="perm-desc">AI safety detect</div></div><div class="perm-toggle on" id="tog-mic">✓</div></div>
+    <div onclick="togglePerm('cam')" class="perm-row"><div class="perm-icon">📷</div><div class="perm-info"><div class="perm-name">Camera</div><div class="perm-desc">Evidence on SOS</div></div><div class="perm-toggle" id="tog-cam"></div></div>
+    <button class="btn btn-primary btn-full" onclick="allowPerms()" data-testid="perm-allow">✓ Allow & Continue</button>
+    <button class="btn btn-ghost btn-full" onclick="rejectPerms()" data-testid="perm-skip">Skip</button>
+  </div>
+</div>
+
+<!-- ORDER FOOD MODAL -->
+<div class="modal-overlay" id="vendorModal">
+  <div class="modal" style="max-height:88vh;">
+    <div class="modal-handle"></div>
+    <div id="vendorModalContent"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-text" id="toastText">Done!</div></div>
+
+<script>
+const API = window.location.origin + '/api';
+let kycData=null, gpsCoords=null, micStream=null, audioCtx=null, analyser=null;
+let cart=[], currentVendor=null;
+const permState = {loc:true, mic:true, cam:false};
+
+// ─── PAGES ───
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const p = document.getElementById('page-'+id);
+  if(p){ p.classList.add('active'); p.scrollTop=0; }
+  const map = {home:0,food:1,chat:2,trains:3,safety:4};
+  if(map[id]!==undefined){
+    document.querySelectorAll('.bottom-nav .nav-btn')[map[id]].classList.add('active');
+  }
+  if(id==='food') loadFood();
+  if(id==='home-foods') loadCooks();
+  if(id==='complaints') loadComplaints();
+  if(id==='crowd') renderHeatmap();
+  if(id==='admin' && adminToken) loadAdminData();
+}
+
+// ─── TOAST ───
+function showToast(msg, color){
+  const t=document.getElementById('toast'); const txt=document.getElementById('toastText');
+  txt.textContent=msg; txt.style.color=color||'var(--green)';
+  t.style.borderColor=color?color+'44':'rgba(34,197,94,0.3)';
+  t.classList.add('show'); clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ─── KYC ───
+function loadKYC(){ try{const r=localStorage.getItem('yatra_kyc'); if(r){ kycData=JSON.parse(r); renderUserBar(); }}catch(_){} }
+function renderUserBar(){
+  if(!kycData) return;
+  const bar=document.getElementById('userBar'), pill=document.getElementById('livePill');
+  bar.style.display='flex'; pill.style.display='none';
+  document.getElementById('userBarName').textContent=kycData.full_name.split(' ')[0];
+  document.getElementById('userAvatar').textContent=kycData.full_name.charAt(0).toUpperCase();
+}
+async function submitKYC(){
+  const n=document.getElementById('kycName').value.trim(), p=document.getElementById('kycPhone').value.trim(),
+        a=document.getElementById('kycAadhaar').value.trim(), e=document.getElementById('kycEmail').value.trim();
+  if(n.length<2){showToast('⚠️ Enter name','#F59E0B');return;}
+  if(!/^\d{10}$/.test(p)){showToast('⚠️ 10-digit mobile','#F59E0B');return;}
+  if(!/^\d{4}$/.test(a)){showToast('⚠️ 4-digit Aadhaar','#F59E0B');return;}
+  try{
+    const r=await fetch(API+'/kyc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name:n,phone:p,aadhaar_last4:a,email:e||null})});
+    if(!r.ok){const er=await r.json();throw new Error(er.detail||'Failed');}
+    kycData=await r.json(); localStorage.setItem('yatra_kyc',JSON.stringify(kycData));
+    document.getElementById('kycModal').classList.remove('show');
+    renderUserBar(); showToast('✅ KYC verified · '+kycData.id);
+    setTimeout(()=>document.getElementById('permModal').classList.add('show'),300);
+  }catch(e){showToast('⚠️ '+e.message,'#EF4444');}
+}
+function skipKYC(){document.getElementById('kycModal').classList.remove('show');setTimeout(()=>document.getElementById('permModal').classList.add('show'),300);}
+
+// ─── PERMS ───
+function togglePerm(k){permState[k]=!permState[k];const t=document.getElementById('tog-'+k);t.classList.toggle('on',permState[k]);t.textContent=permState[k]?'✓':'';}
+async function allowPerms(){
+  document.getElementById('permModal').classList.remove('show');
+  if(permState.loc&&navigator.geolocation){navigator.geolocation.watchPosition(po=>{gpsCoords={lat:po.coords.latitude,lng:po.coords.longitude,acc:po.coords.accuracy};},()=>{},{enableHighAccuracy:true,maximumAge:5000});}
+  if(permState.mic){try{micStream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});audioCtx=new(window.AudioContext||window.webkitAudioContext)();analyser=audioCtx.createAnalyser();analyser.fftSize=256;audioCtx.createMediaStreamSource(micStream).connect(analyser);startAudio();}catch(_){document.getElementById('micStatus').textContent='✗';}}
+  showToast('✅ Welcome to Yatra Sathi!'); startAISim();
+}
+function rejectPerms(){document.getElementById('permModal').classList.remove('show');startAISim();}
+const dArr=new Uint8Array(128);
+function startAudio(){function l(){if(!analyser)return;analyser.getByteFrequencyData(dArr);const a=dArr.reduce((x,y)=>x+y,0)/dArr.length;const db=Math.round(40+(a/255)*60);const el=document.getElementById('aiSoundDb');if(el){el.textContent=db+' dB';el.style.color=db>85?'var(--red)':db>72?'var(--amber)':'var(--orange)';}document.querySelectorAll('.wave-bar').forEach((b,i)=>{const s=Math.round((i/8)*dArr.length);b.style.height=(4+Math.round((dArr[s]/255)*22))+'px';});requestAnimationFrame(l);}l();}
+function startAISim(){const m=['Normal','Normal','Normal','Rapid','Normal'],s=['Calm','Calm','Calm','Elevated','Calm'],l=['On Track','On Track','On Track','Off Route?','On Track'];let t=0;setInterval(()=>{t=(t+1)%5;if(!analyser){const db=62+Math.round(Math.random()*18);const e=document.getElementById('aiSoundDb');if(e){e.textContent=db+' dB';e.style.color=db>72?'var(--amber)':'var(--orange)';}document.querySelectorAll('.wave-bar').forEach(b=>b.style.height=(4+Math.round(Math.random()*22))+'px');}const mEl=document.getElementById('aiMotion'),sEl=document.getElementById('aiStress'),lEl=document.getElementById('aiLocation');if(mEl){mEl.textContent=m[t];mEl.style.color=m[t]==='Normal'?'var(--green)':'var(--red)';}if(sEl){sEl.textContent=s[t];sEl.style.color=s[t]==='Calm'?'var(--green)':'var(--amber)';}if(lEl){lEl.textContent=l[t];lEl.style.color=l[t]==='On Track'?'var(--green)':'var(--red)';}},4500);}
+
+// ─── FOOD ───
+let foodFilter='all';
+function setFoodFilter(f,btn){document.querySelectorAll('#foodChips .chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');foodFilter=f;loadFood();}
+async function loadFood(){
+  const stn=document.getElementById('foodStation').value.trim().toUpperCase();
+  const sec=document.getElementById('foodSections');
+  sec.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:11px;"><span class="spinner"></span> Loading delicious food…</div>';
+  try{
+    const url=API+'/food/recommendations'+(stn?`?station=${stn}`:'');
+    const r=await fetch(url); const d=await r.json();
+    if(d.ai_tip){document.getElementById('foodAiTipText').textContent=d.ai_tip;document.getElementById('foodAiTip').style.display='block';}
+    let html='';
+    Object.entries(d.sections).forEach(([k,sec])=>{
+      let items=sec.data;
+      if(foodFilter==='veg') items=items.filter(v=>v.veg_pct>=70);
+      else if(foodFilter==='nonveg') items=items.filter(v=>v.veg_pct<70);
+      else if(foodFilter==='healthy') items=items.filter(v=>v.hygiene==='A+');
+      if(!items.length) return;
+      html+=`<div class="section"><div class="section-head"><div class="section-title">${sec.title}</div></div><div class="h-scroll">`;
+      items.forEach(v=>{
+        const bcls=v.badge.toLowerCase();
+        html+=`<div class="vendor-card" onclick="openVendor('${v.id}')" data-testid="vendor-${v.id}">
+          <span class="vendor-badge ${bcls}">${v.badge}</span>
+          <div class="vendor-logo">${v.logo}</div>
+          <div class="vendor-name">${v.name}</div>
+          <div class="vendor-meta"><span class="vendor-rating">★ ${v.rating}</span><span>·</span><span>${v.station}</span></div>
+          <div class="vendor-prep">⏱ ${v.prep_min} min · ${v.delivery_success}% on-time</div>
+          <div class="vendor-tags">${v.tags.slice(0,2).map(t=>`<span class="vendor-tag">${t}</span>`).join('')}</div>
+        </div>`;
+      });
+      html+='</div></div>';
+    });
+    sec.innerHTML=html||'<div style="padding:30px;text-align:center;color:var(--text3);font-size:11px;">No vendors match this filter.</div>';
+    // Update home trending
+    const trending=document.getElementById('trendingScroll');
+    if(trending){
+      trending.innerHTML=d.sections.trending.data.slice(0,5).map(v=>`<div class="vendor-card" onclick="showPage('food');setTimeout(()=>openVendor('${v.id}'),300)">
+        <span class="vendor-badge ${v.badge.toLowerCase()}">${v.badge}</span>
+        <div class="vendor-logo">${v.logo}</div><div class="vendor-name">${v.name}</div>
+        <div class="vendor-meta"><span class="vendor-rating">★ ${v.rating}</span></div>
+        <div class="vendor-prep">⏱ ${v.prep_min} min</div></div>`).join('');
+    }
+  }catch(e){sec.innerHTML='<div style="padding:30px;text-align:center;color:var(--red);font-size:11px;">Could not load food.</div>';}
+}
+async function openVendor(vid){
+  const md=document.getElementById('vendorModal'); md.classList.add('show');
+  const cont=document.getElementById('vendorModalContent');
+  cont.innerHTML='<div style="padding:30px;text-align:center;"><span class="spinner"></span></div>';
+  try{
+    const r=await fetch(API+'/food/menu/'+vid); const d=await r.json();
+    currentVendor=vid;
+    cont.innerHTML=`<div style="margin-bottom:12px;"><div style="font-size:17px;font-weight:900;">Menu</div><div style="font-size:10px;color:var(--text3);">${d.items.length} items · Add to cart</div></div>`+
+      d.items.map(it=>{
+        const dot=it.veg?'<span class="veg-dot"></span>':'<span class="nonveg-dot"></span>';
+        return `<div class="menu-item">
+          <div class="menu-item-img">${it.veg?'🥗':'🍗'}</div>
+          <div class="menu-item-body">
+            <div class="menu-item-name">${dot}${it.name}</div>
+            <div class="menu-item-desc">${it.desc}</div>
+            <div class="menu-item-bottom">
+              <div><span class="menu-item-price">₹${it.price}</span> ${(it.diet||[]).slice(0,2).map(d=>`<span class="menu-item-diet-tag">${d}</span>`).join('')}</div>
+              <button class="menu-item-add" onclick="addToCart('${vid}','${it.id}','${it.name.replace(/'/g,"\\'")}',${it.price})" data-testid="add-${it.id}">+ Add</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+  }catch(e){cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);">Menu unavailable</div>';}
+}
+function addToCart(vid,id,name,price){
+  const ex=cart.find(c=>c.item_id===id);
+  if(ex) ex.qty++;
+  else cart.push({vendor_id:vid,item_id:id,name,price,qty:1});
+  updateCart(); showToast(`✅ Added ${name}`);
+}
+function updateCart(){
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const cnt=cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('cartCount').textContent=`${cnt} item${cnt!==1?'s':''}`;
+  document.getElementById('cartTotal').textContent='₹'+total;
+  document.getElementById('cartBar').classList.toggle('show',cnt>0);
+}
+function openCart(){
+  if(!cart.length) return;
+  document.getElementById('vendorModal').classList.add('show');
+  document.getElementById('vendorModalContent').innerHTML=`
+    <div style="font-size:17px;font-weight:900;margin-bottom:10px;">Your Cart</div>
+    ${cart.map((c,i)=>`<div class="menu-item"><div class="menu-item-img">🍽</div><div class="menu-item-body"><div class="menu-item-name">${c.name}</div><div class="menu-item-bottom"><div class="menu-item-price">₹${c.price} × ${c.qty} = ₹${c.price*c.qty}</div><button class="menu-item-add" style="background:var(--red);" onclick="cart.splice(${i},1);updateCart();openCart();">Remove</button></div></div></div>`).join('')}
+    <div class="form-group" style="margin-top:14px;"><label class="form-label">PNR (optional)</label><input class="form-input" id="orderPnr" placeholder="10-digit PNR"/></div>
+    <div style="display:flex;gap:8px;"><div class="form-group" style="flex:1;"><label class="form-label">Train</label><input class="form-input" id="orderTrain" placeholder="12951"/></div><div class="form-group" style="flex:1;"><label class="form-label">Coach</label><input class="form-input" id="orderCoach" placeholder="S5"/></div></div>
+    <div class="form-group"><label class="form-label">Delivery Station</label><input class="form-input" id="orderStn" placeholder="BPL, NDLS…"/></div>
+    <div style="font-size:17px;font-weight:900;margin:14px 0 6px;">Total: <span style="color:var(--orange);">₹${cart.reduce((s,i)=>s+i.price*i.qty,0)}</span></div>
+    <button class="btn btn-orange btn-full" onclick="placeOrder()" data-testid="place-order">✓ Place Order</button>`;
+}
+async function placeOrder(){
+  const stn=document.getElementById('orderStn').value.trim().toUpperCase();
+  if(!stn){showToast('⚠️ Enter delivery station','#F59E0B');return;}
+  try{
+    const r=await fetch(API+'/food/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      vendor_id:cart[0].vendor_id, items:cart, pnr:document.getElementById('orderPnr').value.trim()||null,
+      train_no:document.getElementById('orderTrain').value.trim()||null, coach:document.getElementById('orderCoach').value.trim()||null,
+      delivery_station:stn, customer_name:kycData?.full_name||'Guest', customer_phone:kycData?.phone||null
+    })});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const o=await r.json();
+    cart=[]; updateCart();
+    document.getElementById('vendorModalContent').innerHTML=`
+      <div style="text-align:center;padding:20px 0;">
+        <div style="font-size:48px;">🎉</div>
+        <div style="font-size:18px;font-weight:900;margin:8px 0 4px;">Order Confirmed!</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);">${o.id}</div>
+        <div style="font-size:13px;margin-top:14px;">${o.vendor_name}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px;">Delivery to <strong>${o.delivery_station}</strong> in ~<strong style="color:var(--orange);">${o.eta_min} min</strong></div>
+        <div style="font-size:14px;font-weight:800;margin-top:10px;color:var(--orange);">₹${o.total}</div>
+        <div id="trackingBox" style="margin-top:18px;"></div>
+      </div>`;
+    trackOrder(o.id);
+  }catch(e){showToast('⚠️ Order failed: '+e.message,'#EF4444');}
+}
+async function trackOrder(oid){
+  const box=document.getElementById('trackingBox'); if(!box) return;
+  try{
+    const r=await fetch(API+'/food/order/'+oid); const o=await r.json();
+    const stages=['preparing','cooking','packed','out_for_delivery','delivered'];
+    const icons={preparing:'📋',cooking:'🍳',packed:'📦',out_for_delivery:'🛵',delivered:'✅'};
+    const labels={preparing:'Prep',cooking:'Cook',packed:'Pack',out_for_delivery:'Out',delivered:'Done'};
+    const idx=stages.indexOf(o.live_stage);
+    box.innerHTML=`<div class="order-track">
+      <div style="font-size:11px;font-weight:700;color:var(--orange);">Live Tracking · ETA ${o.live_eta_min} min</div>
+      <div class="order-stages">
+        <div class="order-stages-fill" style="width:${Math.max(0,(idx)/(stages.length-1)*84)}%;"></div>
+        ${stages.map((s,i)=>`<div class="order-stage ${i<idx?'done':i===idx?'active':''}"><div class="order-stage-icon">${icons[s]}</div>${labels[s]}</div>`).join('')}
+      </div>
+    </div>`;
+    if(o.live_stage!=='delivered') setTimeout(()=>trackOrder(oid),8000);
+  }catch(_){}
+}
+
+// ─── HOME FOODS ───
+function setHomeFoodTab(t,btn){document.querySelectorAll('#page-home-foods .tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('hf-customer').style.display=t==='customer'?'block':'none';document.getElementById('hf-cook').style.display=t==='cook'?'block':'none';}
+async function loadCooks(){
+  const stn=document.getElementById('hfStation').value.trim().toUpperCase();
+  const list=document.getElementById('cooksList');
+  list.innerHTML='<div style="padding:18px;text-align:center;color:var(--text3);font-size:11px;"><span class="spinner"></span> Loading kitchens…</div>';
+  try{
+    const r=await fetch(API+'/home-foods/cooks'+(stn?'?station='+stn:''));
+    const d=await r.json();
+    if(!d.length){list.innerHTML='<div style="padding:18px;text-align:center;color:var(--text3);font-size:11px;">No cooks here yet. Be the first to register!</div>';return;}
+    list.innerHTML='';
+    const hScroll=document.createElement('div'); hScroll.className='h-scroll'; hScroll.style.margin='0 0 14px';
+    hScroll.innerHTML=d.map(c=>`<div class="cook-card" onclick="openCookMenu('${c.id}','${c.kitchen_name.replace(/'/g,"\\'")}')" data-testid="cook-${c.id}">
+      <div class="cook-avatar">${c.name.charAt(0)}</div>
+      <div class="cook-kitchen">${c.kitchen_name}</div>
+      <div class="cook-by">by ${c.name} · ${c.station_hub}</div>
+      <div class="cook-cuisine">${c.cuisine.join(' · ')}</div>
+      <div class="cook-stats"><span class="cook-stat hi">★ ${c.rating}</span><span class="cook-stat">${c.orders_total} orders</span></div>
+    </div>`).join('');
+    list.appendChild(hScroll);
+    // Home cooks for home page
+    const homeScroll=document.getElementById('cooksScroll');
+    if(homeScroll) homeScroll.innerHTML=d.slice(0,5).map(c=>`<div class="cook-card" onclick="showPage('home-foods');setTimeout(()=>openCookMenu('${c.id}','${c.kitchen_name.replace(/'/g,"\\'")}'),300)"><div class="cook-avatar">${c.name.charAt(0)}</div><div class="cook-kitchen">${c.kitchen_name}</div><div class="cook-by">by ${c.name}</div><div class="cook-cuisine">${c.cuisine.join(' · ')}</div><div class="cook-stats"><span class="cook-stat hi">★ ${c.rating}</span></div></div>`).join('');
+  }catch(e){list.innerHTML='<div style="padding:18px;color:var(--red);text-align:center;font-size:11px;">Failed to load cooks</div>';}
+}
+async function openCookMenu(cid,name){
+  document.getElementById('vendorModal').classList.add('show');
+  const cont=document.getElementById('vendorModalContent');
+  cont.innerHTML='<div style="padding:24px;text-align:center;"><span class="spinner"></span></div>';
+  try{
+    const r=await fetch(API+'/home-foods/menu/'+cid); const items=await r.json();
+    cont.innerHTML=`<div style="font-size:17px;font-weight:900;margin-bottom:4px;">${name}</div><div style="font-size:10px;color:var(--text3);margin-bottom:12px;">Homemade · Fresh · Pre-book ahead</div>`+
+      items.map(it=>{
+        const dot=it.veg?'<span class="veg-dot"></span>':'<span class="nonveg-dot"></span>';
+        return `<div class="menu-item">
+          <div class="menu-item-img">${it.veg?'🥘':'🍗'}</div>
+          <div class="menu-item-body"><div class="menu-item-name">${dot}${it.name}</div>
+          <div class="menu-item-desc">${it.description}</div>
+          <div class="menu-item-bottom"><div><span class="menu-item-price">₹${it.price}</span> ${(it.diet_tags||[]).slice(0,2).map(d=>`<span class="menu-item-diet-tag">${d}</span>`).join('')}</div>
+          <button class="menu-item-add" onclick="addToCart('${cid}','${it.id}','${it.name.replace(/'/g,"\\'")}',${it.price})" data-testid="cook-add-${it.id}">+ Add</button></div></div></div>`;
+      }).join('');
+  }catch(e){cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);">Menu unavailable</div>';}
+}
+async function registerCook(ev){
+  const btn=ev.target;
+  const data={name:document.getElementById('cookName').value.trim(),phone:document.getElementById('cookPhone').value.trim(),
+    kitchen_name:document.getElementById('cookKitchen').value.trim(),city:document.getElementById('cookCity').value.trim(),
+    station_hub:document.getElementById('cookStation').value.trim(),
+    delivery_radius_km:parseInt(document.getElementById('cookRadius').value)||5,
+    cuisine:document.getElementById('cookCuisine').value.split(',').map(s=>s.trim()).filter(Boolean),
+    daily_capacity:parseInt(document.getElementById('cookCapacity').value)||20,
+    specialties:document.getElementById('cookSpec').value.trim()};
+  if(!data.name||!data.kitchen_name||!data.city||!data.station_hub){showToast('⚠️ Fill required fields','#F59E0B');return;}
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Registering…';
+  try{
+    const r=await fetch(API+'/home-foods/cook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    if(!r.ok){const e=await r.json();throw new Error(e.detail);}
+    const c=await r.json();
+    showToast('✅ Welcome '+c.name+'! ID: '+c.id);
+    loadCookInsights(c.id);
+  }catch(e){showToast('⚠️ '+e.message,'#EF4444');}
+  finally{btn.disabled=false; btn.innerHTML='🚀 Register & Start Earning';}
+}
+async function loadCookInsights(cid){
+  document.getElementById('cookInsightsBox').style.display='block';
+  const cont=document.getElementById('cookInsightsContent');
+  cont.innerHTML='<div style="text-align:center;padding:16px;"><span class="spinner"></span> Generating AI insights…</div>';
+  try{
+    const r=await fetch(API+'/home-foods/insights/'+cid); const d=await r.json();
+    cont.innerHTML=`
+      <div style="background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(255,27,109,0.05));border:1px solid rgba(168,85,247,0.2);padding:11px;border-radius:9px;margin-bottom:10px;">
+        <div style="font-size:9.5px;color:var(--purple);font-weight:700;margin-bottom:4px;">🤖 AI ADVICE</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.55;">${d.ai_advice}</div>
+      </div>
+      <div class="ai-grid">
+        <div class="ai-metric"><div class="ai-metric-label">Predicted Orders</div><div class="ai-metric-val" style="color:var(--green);">${d.predicted_orders_today}</div><div class="ai-metric-sub">Today</div></div>
+        <div class="ai-metric"><div class="ai-metric-label">This Week Est.</div><div class="ai-metric-val" style="color:var(--orange);font-size:14px;">₹${Math.round(d.earnings_this_week).toLocaleString('en-IN')}</div></div>
+      </div>
+      <div style="margin-top:10px;font-size:10.5px;color:var(--text2);line-height:1.7;">
+        <strong style="color:var(--text);">⏰ Peak Hours:</strong> ${d.peak_hours.join(', ')}<br/>
+        <strong style="color:var(--text);">🔥 Trending Items:</strong> ${d.trending_items.join(', ')}<br/>
+        <strong style="color:var(--text);">📊 Cook Qty Today:</strong> ${Object.entries(d.suggested_prep_qty).map(([k,v])=>`${k} (${v})`).join(' · ')}<br/>
+        <strong style="color:var(--text);">♻️ Waste Tip:</strong> ${d.waste_reduction_tip}
+      </div>`;
+  }catch(e){cont.innerHTML='<div style="color:var(--red);padding:10px;">Insights unavailable</div>';}
+}
+
+// ─── TRAIN LIVE ───
+async function trackTrain(){
+  const no=document.getElementById('trainInput').value.trim();
+  if(!no){showToast('⚠️ Enter train number','#F59E0B');return;}
+  const box=document.getElementById('trainResult');
+  box.innerHTML='<div class="panel" style="text-align:center;"><span class="spinner"></span> Fetching live data…</div>';
+  try{
+    const r=await fetch(API+'/train/'+no+'/live'); const d=await r.json();
+    const route=d.route;
+    const curIdx=route.indexOf(d.current_station);
+    box.innerHTML=`<div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div><div class="panel-title">🚂 ${d.train_name}</div>${d.train_type?`<div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-top:2px;">${d.train_type}</div>`:''}</div>
+        <div style="font-size:8px;font-weight:800;letter-spacing:0.5px;padding:3px 8px;border-radius:6px;${d.data_source && d.data_source.includes('RailRadar')?'background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3);':'background:rgba(245,158,11,0.15);color:var(--amber);'}">${d.data_source||'LIVE'}</div>
+      </div>
+      <div style="font-size:10.5px;color:var(--text2);margin-bottom:4px;margin-top:6px;"><strong>${d.source}</strong> → <strong>${d.destination}</strong>${d.distance_km?` · ${Math.round(d.distance_km)} km`:''}</div>
+      <div class="train-route-viz">
+        <div class="train-track"><div class="train-fill" id="tFill" style="width:0%;"></div><div class="train-loco" id="tLoco" style="left:0%;">🚂</div></div>
+        <div class="train-stops">${route.map((s,i)=>`<div class="train-stop ${i<curIdx?'passed':i===curIdx?'current':''}"><div class="train-stop-dot"></div>${s}</div>`).join('')}</div>
+      </div>
+      <div class="train-info-grid">
+        <div class="train-info-cell"><div class="train-info-label">Current</div><div class="train-info-val">${d.current_station}</div></div>
+        <div class="train-info-cell"><div class="train-info-label">Next</div><div class="train-info-val" style="color:var(--orange);">${d.next_station}</div></div>
+        <div class="train-info-cell"><div class="train-info-label">Speed</div><div class="train-info-val">${d.speed_kmph} km/h</div></div>
+        <div class="train-info-cell"><div class="train-info-label">Delay</div><div class="train-info-val" style="color:${d.delay_min>0?'var(--red)':'var(--green)'};">${d.delay_min>0?'+'+d.delay_min+'m':'On Time'}</div></div>
+        <div class="train-info-cell"><div class="train-info-label">ETA Next</div><div class="train-info-val">${d.eta_next_min} min</div></div>
+        <div class="train-info-cell"><div class="train-info-label">Platform</div><div class="train-info-val">${d.platform} <span style="font-size:9px;color:var(--text3);">(${d.platform_confidence}%)</span></div></div>
+      </div>
+    </div>
+    <div class="panel"><div class="panel-title">🚃 Coach Crowd</div><div style="margin-top:10px;">
+      ${d.coaches.map(c=>{const col=c.pct>=80?'var(--red)':c.pct>=55?'var(--amber)':'var(--green)';return `<div class="coach-row"><div class="coach-lbl">${c.id} ${c.type}</div><div class="coach-track"><div class="coach-fill" style="width:0%;background:${col};" data-w="${c.pct}"></div></div><div class="coach-pct" style="color:${col};">${c.pct}%</div></div>`;}).join('')}
+      <div style="margin-top:8px;font-size:10px;color:var(--green);">💡 Less crowded: ${d.coaches.filter(c=>c.pct<55).map(c=>c.id).join(', ')||'All busy'}</div>
+    </div></div>
+    <div class="panel" style="background:linear-gradient(135deg,rgba(255,122,26,0.07),rgba(255,27,109,0.04));border-color:rgba(255,122,26,0.2);">
+      <div class="panel-title">🍱 Order Food for Next Stop</div>
+      <div class="panel-sub">${d.next_food_station} — vendors ready to deliver</div>
+      <button class="btn btn-orange btn-full" onclick="document.getElementById('foodStation').value='${d.next_food_station}';showPage('food');">🍱 Browse Food at ${d.next_food_station}</button>
+    </div>`;
+    setTimeout(()=>{
+      document.getElementById('tFill').style.width=d.progress_pct+'%';
+      document.getElementById('tLoco').style.left=Math.min(94,Math.max(2,d.progress_pct-2))+'%';
+      document.querySelectorAll('.coach-fill[data-w]').forEach(e=>e.style.width=e.dataset.w+'%');
+    },200);
+  }catch(e){box.innerHTML='<div class="panel"><div style="text-align:center;color:var(--red);">Could not fetch train</div></div>';}
+}
+
+// ─── PNR ───
+async function checkPNR(){
+  const pnr=document.getElementById('pnrInput').value.trim();
+  if(!/^\d{10}$/.test(pnr)){showToast('⚠️ PNR must be 10 digits','#F59E0B');return;}
+  const box=document.getElementById('pnrResult');
+  box.innerHTML='<div class="panel" style="text-align:center;"><span class="spinner"></span> Looking up PNR…</div>';
+  try{
+    const r=await fetch(API+'/pnr/'+pnr);
+    if(!r.ok) throw new Error('PNR not found');
+    const d=await r.json();
+    box.innerHTML=`<div class="panel">
+      <div class="panel-title">${d.train_name}</div>
+      <div style="font-size:10.5px;color:var(--text2);margin-bottom:8px;">PNR: <span style="font-family:var(--mono);">${d.pnr}</span> · ${d.class}</div>
+      <div class="train-info-grid">
+        <div class="train-info-cell"><div class="train-info-label">From</div><div class="train-info-val">${d.from_station}</div></div>
+        <div class="train-info-cell"><div class="train-info-label">To</div><div class="train-info-val">${d.to_station}</div></div>
+        <div class="train-info-cell"><div class="train-info-label">DoJ</div><div class="train-info-val" style="font-size:12px;">${d.doj}</div></div>
+        <div class="train-info-cell"><div class="train-info-label">Boarding</div><div class="train-info-val">${d.boarding}</div></div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;font-weight:700;">Passengers</div>
+      ${d.passengers.map(p=>`<div style="display:flex;justify-content:space-between;padding:8px;background:var(--s2);border-radius:8px;margin-top:6px;font-size:10.5px;"><span>${p.name} · Age ${p.age}</span><span style="color:${p.status==='CNF'?'var(--green)':p.status==='RAC'?'var(--amber)':'var(--red)'};font-weight:800;">${p.status} ${p.berth}</span></div>`).join('')}
+      <div style="margin-top:10px;font-size:10px;color:var(--text3);">Chart: ${d.chart_prepared?'✓ Prepared':'⏳ Pending'}</div>
+      <button class="btn btn-orange btn-full" onclick="document.getElementById('trainInput').value='${d.train_no}';showPage('trains');setTimeout(trackTrain,300);">📡 Track Live ›</button>
+    </div>`;
+  }catch(e){box.innerHTML='<div class="panel" style="text-align:center;color:var(--red);">PNR not found</div>';}
+}
+
+// ─── STATION HUB ───
+async function loadHub(){
+  const c=document.getElementById('hubInput').value.trim().toUpperCase();
+  if(!c){showToast('⚠️ Enter station code','#F59E0B');return;}
+  const box=document.getElementById('hubResult');
+  box.innerHTML='<div class="panel" style="text-align:center;"><span class="spinner"></span> Loading station…</div>';
+  try{
+    const r=await fetch(API+'/station/'+c+'/hub'); const d=await r.json();
+    box.innerHTML=`<div class="panel">
+      <div class="panel-title">🚉 ${d.name}</div>
+      <div style="font-size:10.5px;color:var(--text2);margin-bottom:8px;">${d.platforms} platforms · Crowd ${d.crowd}%</div>
+      <div style="padding:11px;background:linear-gradient(135deg,rgba(20,184,166,0.1),rgba(34,197,94,0.05));border:1px solid rgba(20,184,166,0.2);border-radius:10px;margin-bottom:12px;">
+        <div style="font-size:9.5px;color:var(--teal);font-weight:700;margin-bottom:4px;">🤖 AI SMART ROUTE</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.5;">${d.ai_route}</div>
+      </div>
+      <div class="hub-item"><div class="hub-item-icon">🚌</div><div class="hub-item-body"><div class="hub-item-name">Bus Stand</div><div class="hub-item-val">${(d.bus||[]).join(' · ')}</div></div></div>
+      <div class="hub-item"><div class="hub-item-icon">🚇</div><div class="hub-item-body"><div class="hub-item-name">Metro</div><div class="hub-item-val">${(d.metro||[]).join(' · ')}</div></div></div>
+      <div class="hub-item"><div class="hub-item-icon">🚕</div><div class="hub-item-body"><div class="hub-item-name">Auto / Taxi</div><div class="hub-item-val">${d.auto}</div></div></div>
+      <div class="hub-item"><div class="hub-item-icon">🅿️</div><div class="hub-item-body"><div class="hub-item-name">Parking</div><div class="hub-item-val">${d.parking}</div></div></div>
+      <div class="hub-item"><div class="hub-item-icon">⚡</div><div class="hub-item-body"><div class="hub-item-name">EV Charging</div><div class="hub-item-val">${d.ev}</div></div></div>
+      <div class="hub-item"><div class="hub-item-icon">🚻</div><div class="hub-item-body"><div class="hub-item-name">Washroom</div><div class="hub-item-val">Rating ${d.washroom}</div></div></div>
+      <div class="hub-item"><div class="hub-item-icon">💼</div><div class="hub-item-body"><div class="hub-item-name">Cloak Room</div><div class="hub-item-val">${d.cloak}</div></div></div>
+      <div class="hub-item"><div class="hub-item-icon">💊</div><div class="hub-item-body"><div class="hub-item-name">Medical</div><div class="hub-item-val">${d.medical}</div></div></div>
+      <div class="hub-item"><div class="hub-item-icon">🍽</div><div class="hub-item-body"><div class="hub-item-name">Food Court</div><div class="hub-item-val">${d.food_court}</div></div></div>
+      <div class="hub-item" style="background:rgba(34,197,94,0.06);border-color:rgba(34,197,94,0.2);"><div class="hub-item-icon">🟢</div><div class="hub-item-body"><div class="hub-item-name" style="color:var(--green);">Safe Exit</div><div class="hub-item-val">${d.safe_exit}</div></div></div>
+    </div>`;
+  }catch(e){box.innerHTML='<div class="panel" style="color:var(--red);text-align:center;">Could not load</div>';}
+}
+
+// ─── YATRA AI CHAT ───
+let chatSession='ses-'+Math.random().toString(36).slice(2,10);
+async function sendChat(preset){
+  const input=document.getElementById('chatInput');
+  const text=preset||input.value.trim();
+  if(!text) return;
+  input.value='';
+  const log=document.getElementById('chatLog');
+  log.innerHTML+=`<div class="chat-msg user"><div class="chat-avatar">${kycData?kycData.full_name.charAt(0):'👤'}</div><div class="chat-bubble">${escapeHtml(text)}</div></div>`;
+  log.innerHTML+=`<div class="chat-msg ai" id="thinking"><div class="chat-avatar">🤖</div><div class="chat-bubble"><span class="spinner"></span> Thinking…</div></div>`;
+  log.scrollTop=log.scrollHeight;
+  try{
+    const r=await fetch(API+'/ai/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,session_id:chatSession,context:{user:kycData?.full_name}})});
+    const d=await r.json();
+    document.getElementById('thinking').remove();
+    log.innerHTML+=`<div class="chat-msg ai"><div class="chat-avatar">🤖</div><div class="chat-bubble">${escapeHtml(d.reply)}</div></div>`;
+    log.scrollTop=log.scrollHeight;
+  }catch(e){document.getElementById('thinking').remove();log.innerHTML+=`<div class="chat-msg ai"><div class="chat-avatar">🤖</div><div class="chat-bubble">Sorry, I had trouble connecting. Try again?</div></div>`;}
+}
+
+// ─── SOS ───
+let sosT=null,sosC=0;
+function startSOS(e){if(e)e.preventDefault();if(sosT)return;sosC=3;const b=document.getElementById('sosBtn'),s=document.getElementById('sosStatus'),t=document.getElementById('sosTimer');s.textContent='Hold 3 sec...';t.style.display='block';t.textContent='3';b.classList.add('flash');if(navigator.vibrate)navigator.vibrate(100);sosT=setInterval(()=>{sosC--;t.textContent=sosC;if(sosC<=0){clearInterval(sosT);sosT=null;triggerSOS();}},1000);}
+function cancelSOS(){if(!sosT)return;clearInterval(sosT);sosT=null;sosC=0;document.getElementById('sosBtn').classList.remove('flash');document.getElementById('sosStatus').textContent='Press and hold to activate';document.getElementById('sosTimer').style.display='none';}
+async function triggerSOS(){const b=document.getElementById('sosBtn');b.classList.remove('flash');document.getElementById('sosStatus').innerHTML='🚨 <strong style="color:var(--red);">SOS ACTIVATED</strong>';document.getElementById('sosTimer').style.display='none';if(navigator.vibrate)navigator.vibrate([300,100,300,100,300]);try{await fetch(API+'/sos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:gpsCoords?.lat,lng:gpsCoords?.lng,note:'SOS hold',user_name:kycData?.full_name,user_phone:kycData?.phone})});}catch(_){}showToast('🚨 SOS Sent! RPF & contacts notified','#EF4444');setTimeout(()=>document.getElementById('sosStatus').textContent='Press and hold to activate',8000);}
+
+// ─── COMPLAINTS ───
+let selectedCat=null;
+function pickCat(el){document.querySelectorAll('.cat-pick').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');selectedCat=el.dataset.cat;}
+const CAT_META={cleanliness:{icon:'🧹',auth:'Cleaning Supervisor'},alcohol:{icon:'🍺',auth:'RPF/TTE'},smoking:{icon:'🚬',auth:'RPF'},food:{icon:'🍱',auth:'IRCTC'},beggars:{icon:'🚫',auth:'RPF/GRP'},other:{icon:'📝',auth:'Helpdesk 139'}};
+async function submitComplaint(ev){
+  if(!selectedCat){showToast('⚠️ Pick category','#F59E0B');return;}
+  const desc=document.getElementById('cmpDesc').value.trim();
+  if(desc.length<8){showToast('⚠️ Min 8 chars','#F59E0B');return;}
+  const btn=ev.target; btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Submitting…';
+  try{
+    const r=await fetch(API+'/complaints',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({category:selectedCat,description:desc,train_no:document.getElementById('cmpTrainNo').value.trim()||null,coach:document.getElementById('cmpCoach').value.trim()||null,station:document.getElementById('cmpStation').value.trim()||null,reporter_name:kycData?.full_name,reporter_phone:kycData?.phone})});
+    const c=await r.json();
+    showToast(`✅ ${c.id} filed`); 
+    const banner=document.getElementById('takeoverBanner');
+    document.getElementById('takeoverTitle').textContent=`🚓 ${c.assigned_to.toUpperCase()} TAKEOVER`;
+    document.getElementById('takeoverBody').innerHTML=`<strong>Action:</strong> ${c.action_taken}`;
+    banner.classList.add('show'); setTimeout(()=>banner.classList.remove('show'),15000);
+    document.getElementById('cmpDesc').value=''; document.querySelectorAll('.cat-pick').forEach(x=>x.classList.remove('selected')); selectedCat=null;
+    loadComplaints();
+  }catch(e){showToast('⚠️ '+e.message,'#EF4444');}
+  finally{btn.disabled=false;btn.innerHTML='⚡ Submit & Alert Authority';}
+}
+async function loadComplaints(){
+  const list=document.getElementById('complaintsList');
+  try{
+    const r=await fetch(API+'/complaints'); const d=await r.json();
+    if(!d.length){list.innerHTML='<div style="text-align:center;padding:14px;color:var(--text3);font-size:11px;">No complaints yet</div>';return;}
+    list.innerHTML=d.slice(0,10).map(c=>{const m=CAT_META[c.category]||CAT_META.other;return `<div class="complaint-card"><div class="cmp-head"><div><span style="font-size:16px;">${m.icon}</span> <span class="cmp-cat">${c.category}</span></div><div style="text-align:right;"><span class="cmp-sev sev-${c.severity}">${c.severity.toUpperCase()}</span><div class="cmp-id" style="margin-top:2px;">${c.id}</div></div></div><div class="cmp-desc">"${escapeHtml(c.ai_summary||c.description)}"</div><div class="cmp-meta">${c.train_no?`<span class="meta-chip">🚂 ${c.train_no}</span>`:''}${c.coach?`<span class="meta-chip">🚃 ${c.coach}</span>`:''}${c.station?`<span class="meta-chip">📍 ${c.station}</span>`:''}</div><div class="cmp-action"><strong>${m.auth}:</strong> ${escapeHtml(c.action_taken)}</div></div>`;}).join('');
+  }catch(_){list.innerHTML='<div style="color:var(--red);text-align:center;font-size:11px;padding:10px;">Load failed</div>';}
+}
+
+// ─── HEATMAP ───
+const CROWD_DB=[{name:'New Delhi',zone:'NDLS',pct:38,tip:'Gate 2 less crowd'},{name:'CST Mumbai',zone:'CSTM',pct:62,tip:'Platform 9-12'},{name:'Howrah',zone:'HWH',pct:85,tip:'South exit'},{name:'Chennai Central',zone:'MAS',pct:58,tip:'Suburban exit'},{name:'Trivandrum',zone:'TVC',pct:45,tip:'East entrance'},{name:'Bhopal',zone:'BPL',pct:55,tip:'East exit'}];
+function renderHeatmap(){
+  const g=document.getElementById('heatmapGrid'); if(!g) return;
+  const icon=p=>p>=75?'🔴':p>=50?'🟡':'🟢';
+  const lvl=p=>p>=75?'high':p>=50?'medium':'low';
+  const col=p=>p>=75?'var(--red)':p>=50?'var(--amber)':'var(--green)';
+  g.innerHTML=CROWD_DB.map(c=>`<div style="background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:11px;"><div style="font-size:11px;font-weight:700;">${c.name}</div><div style="font-size:8.5px;color:var(--text3);">${c.zone}</div><div style="font-size:22px;font-weight:900;font-family:var(--mono);color:${col(c.pct)};line-height:1.1;margin:6px 0 4px;">${c.pct}%</div><div style="font-size:8.5px;color:var(--text2);">${icon(c.pct)} ${lvl(c.pct).toUpperCase()}</div><div style="font-size:8.5px;color:var(--text3);margin-top:4px;line-height:1.4;">💡 ${c.tip}</div></div>`).join('');
+}
+
+// ─── HOTELS ───
+const HOTEL_DB=[
+  {name:'Hotel Raj Palace',city:'delhi',dist:'500m from NDLS',stars:5,price:2200,safety:['✓ CCTV','✓ Women Staff'],desc:'Zero harassment complaints. Female staff 24/7.'},
+  {name:'OYO Express',city:'mumbai',dist:'300m from CSTM',stars:4,price:799,safety:['✓ Budget','✓ 24/7'],desc:'Solid safety. Quick dial emergency.'},
+  {name:'Treebo Trend',city:'bangalore',dist:'1km from SBC',stars:4,price:1400,safety:['✓ Gated','✓ Women Floor'],desc:'Women floor on level 3.'},
+  {name:'Hotel Sai Comfort',city:'kollam',dist:'400m from QLN',stars:4,price:950,safety:['✓ CCTV','✓ Kerala Tourism'],desc:'Family-run, respectful staff.'},
+  {name:'Gokulam Park',city:'trivandrum',dist:'600m from TVC',stars:5,price:3200,safety:['✓ Premium','✓ Women Floor'],desc:'Premium 24/7 security.'},
+  {name:'Hotel Abad Wharf',city:'kochi',dist:'1km from ERS',stars:4,price:2600,safety:['✓ CCTV','✓ Security'],desc:'Waterfront. CCTV all areas.'},
+];
+async function searchHotels(){
+  const c=document.getElementById('hotelCity').value.trim().toLowerCase();
+  const box=document.getElementById('hotelsContainer');
+  if(!c){box.innerHTML=HOTEL_DB.map(renderHotel).join('');return;}
+  const res=HOTEL_DB.filter(h=>h.city.includes(c)||c.includes(h.city));
+  if(!res.length){box.innerHTML='<div style="text-align:center;padding:18px;color:var(--text3);font-size:11px;">No hotels for "'+c+'"</div>';return;}
+  box.innerHTML='<div style="padding:24px;text-align:center;"><span class="spinner"></span></div>';
+  try{
+    const r=await fetch(API+'/ai/tip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:`30 words: safety tip for solo woman traveller booking hotel in ${c}, India.`,max_tokens:80})});
+    const d=await r.json();
+    box.innerHTML=`<div style="padding:11px;background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(255,27,109,0.04));border:1px solid rgba(168,85,247,0.2);border-radius:10px;margin-bottom:10px;"><div style="font-size:9.5px;color:var(--purple);font-weight:700;margin-bottom:4px;">🤖 AI TIP</div><div style="font-size:10.5px;color:var(--text2);">${escapeHtml(d.text)}</div></div>`+res.map(renderHotel).join('');
+  }catch(_){box.innerHTML=res.map(renderHotel).join('');}
+}
+function renderHotel(h){return `<div class="hotel-card"><div style="display:flex;justify-content:space-between;"><div><div class="hotel-name">🏨 ${h.name}</div><div class="hotel-dist">📍 ${h.dist}</div></div><div style="text-align:right;"><div class="hotel-stars" style="color:var(--orange);">${'★'.repeat(h.stars)}${'☆'.repeat(5-h.stars)}</div><div class="hotel-price">₹${h.price.toLocaleString('en-IN')}/nt</div></div></div><div class="hotel-desc">${h.desc}</div><div>${h.safety.map(s=>`<span class="s-tag">${s}</span>`).join('')}</div></div>`;}
+
+// ─── ADMIN ───
+let adminToken=null;
+async function adminLogin(){
+  const p=document.getElementById('adminPin').value.trim();
+  if(!p){showToast('⚠️ Enter PIN','#F59E0B');return;}
+  try{
+    const r=await fetch(API+'/admin/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:p})});
+    if(!r.ok) throw new Error('Invalid PIN');
+    adminToken=p; document.getElementById('adminLogin').style.display='none'; document.getElementById('adminContent').style.display='block';
+    showToast('🔓 Admin unlocked'); loadAdminData();
+  }catch(e){showToast('⚠️ '+e.message,'#EF4444');}
+}
+async function loadAdminData(){
+  try{
+    const s=await(await fetch(API+'/complaints/stats')).json();
+    document.getElementById('adsTotal').textContent=s.total||0;
+    document.getElementById('adsOpen').textContent=(s.by_status?.open||0)+(s.by_severity?.critical||0);
+    document.getElementById('adsAck').textContent=s.by_status?.acknowledged||0;
+    document.getElementById('adsRes').textContent=s.by_status?.resolved||0;
+    const sms=await(await fetch(API+'/admin/sms-log',{headers:{'X-Admin-Pin':adminToken}})).json();
+    document.getElementById('smsLogList').innerHTML=sms.slice(0,8).map(x=>`<div class="sms-row"><div class="sms-rcp">📨 ${(x.recipients||[]).join(' · ')}</div><div style="font-size:9.5px;color:var(--text2);line-height:1.4;">${escapeHtml(x.message||'')}</div></div>`).join('')||'<div style="font-size:10px;color:var(--text3);text-align:center;">No SMS yet</div>';
+    const list=await(await fetch(API+'/complaints')).json();
+    document.getElementById('adminComplaintsList').innerHTML=list.slice(0,15).map(c=>{const m=CAT_META[c.category]||CAT_META.other;return `<div class="complaint-card"><div class="cmp-head"><div><span style="font-size:14px;">${m.icon}</span> <span class="cmp-cat">${c.category}</span></div><div style="text-align:right;"><span class="cmp-sev sev-${c.severity}">${c.severity.toUpperCase()}</span><div class="cmp-id">${c.id}</div></div></div><div class="cmp-desc">"${escapeHtml(c.ai_summary||c.description)}"</div><div class="cmp-status-btns"><button class="cmp-status-btn" onclick="updateCmp('${c.id}','acknowledged')">✓ Ack</button><button class="cmp-status-btn" onclick="updateCmp('${c.id}','resolved')">✅ Resolve</button></div></div>`;}).join('');
+  }catch(_){}
+}
+async function updateCmp(cid,st){try{const r=await fetch(API+'/complaints/'+cid+'/status',{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Pin':adminToken},body:JSON.stringify({status:st})});if(r.ok){showToast(`✅ ${cid} → ${st}`);loadAdminData();}}catch(_){}}
+
+// ─── UTIL ───
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+// CLOSE MODAL
+document.getElementById('vendorModal').addEventListener('click',e=>{if(e.target.id==='vendorModal')e.target.classList.remove('show');});
+
+// INIT
+document.addEventListener('DOMContentLoaded',()=>{
+  loadKYC();
+  if(!kycData) setTimeout(()=>document.getElementById('kycModal').classList.add('show'),500);
+  else setTimeout(()=>document.getElementById('permModal').classList.add('show'),500);
+  // Always populate home-page widgets independent of any modal
+  loadFood();
+  loadCooks();
+  renderHeatmap();
+  document.getElementById('hotelsContainer').innerHTML=HOTEL_DB.map(renderHotel).join('');
+  // Retry trending+cooks if they didn't render (race with food sections)
+  setTimeout(()=>{
+    const t=document.getElementById('trendingScroll');
+    if(t && t.innerHTML.indexOf('Loading')>=0) loadFood();
+    const c=document.getElementById('cooksScroll');
+    if(c && c.innerHTML.indexOf('Loading')>=0) loadCooks();
+  }, 2500);
+});
+</script>
+</body>
+</html>

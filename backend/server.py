@@ -1,5 +1,7 @@
 """Yatra Sathi — Full Backend (Food, Home Foods, Station Hub, Yatra AI, Complaints, SOS, KYC)"""
 from fastapi import FastAPI, APIRouter, HTTPException, Header
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -15,6 +17,8 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+STATIC_DIR = ROOT_DIR / "static"
 
 app = FastAPI(title="Yatra Sathi API")
 api_router = APIRouter(prefix="/api")
@@ -684,6 +688,13 @@ app.include_router(api_router)
 app.add_middleware(CORSMiddleware, allow_credentials=True,
     allow_origins=os.environ.get('CORS_ORIGINS','*').split(','),
     allow_methods=["*"], allow_headers=["*"])
+
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+@app.get("/{full_path:path}")
+def serve_frontend(full_path: str):
+    """Catch-all: serve index.html for any non-API route."""
+    return FileResponse(str(STATIC_DIR / "index.html"))
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
