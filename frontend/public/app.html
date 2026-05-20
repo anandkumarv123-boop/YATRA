@@ -379,14 +379,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   </div>
 
   <div class="quick-grid">
-    <div class="quick-cell" onclick="showPage('food')"><span class="quick-icon">🍱</span><div class="quick-label">Food</div></div>
-    <div class="quick-cell" onclick="showPage('home-foods')"><span class="quick-icon">🏠</span><div class="quick-label">Home<br/>Foods</div></div>
-    <div class="quick-cell" onclick="showPage('trains')"><span class="quick-icon">🚂</span><div class="quick-label">Live<br/>Train</div></div>
-    <div class="quick-cell" onclick="showPage('pnr')"><span class="quick-icon">🎫</span><div class="quick-label">PNR<br/>Status</div></div>
-    <div class="quick-cell" onclick="showPage('station-hub')"><span class="quick-icon">🚉</span><div class="quick-label">Station<br/>Hub</div></div>
-    <div class="quick-cell" onclick="showPage('chat')"><span class="quick-icon">🤖</span><div class="quick-label">Yatra<br/>AI</div></div>
-    <div class="quick-cell" onclick="showPage('hotels')"><span class="quick-icon">🏨</span><div class="quick-label">Hotels</div></div>
-    <div class="quick-cell" onclick="showPage('safety')" style="background:linear-gradient(135deg,var(--red-dim),var(--pink-dim));border-color:rgba(239,68,68,0.3);"><span class="quick-icon">🆘</span><div class="quick-label" style="color:var(--red);">SOS</div></div>
+    <div class="quick-cell" onclick="showPage('food')" data-testid="quick-food"><span class="quick-icon">🍱</span><div class="quick-label">Food</div></div>
+    <div class="quick-cell" onclick="showPage('home-foods')" data-testid="quick-homefood"><span class="quick-icon">🏠</span><div class="quick-label">Home<br/>Foods</div></div>
+    <div class="quick-cell" onclick="showPage('trains')" data-testid="quick-livetrain"><span class="quick-icon">🚂</span><div class="quick-label">Live<br/>Train</div></div>
+    <div class="quick-cell" onclick="showPage('pnr')" data-testid="quick-pnr"><span class="quick-icon">🎫</span><div class="quick-label">PNR<br/>Status</div></div>
+    <div class="quick-cell" onclick="showPage('station-hub')" data-testid="quick-station"><span class="quick-icon">🚉</span><div class="quick-label">Station<br/>Hub</div></div>
+    <div class="quick-cell" onclick="showPage('chat')" data-testid="quick-yatra-ai"><span class="quick-icon">🤖</span><div class="quick-label">Yatra<br/>AI</div></div>
+    <div class="quick-cell" onclick="showPage('hotels')" data-testid="quick-hotels"><span class="quick-icon">🏨</span><div class="quick-label">Hotels</div></div>
+    <div class="quick-cell" onclick="showPage('safety')" data-testid="quick-sos" style="background:linear-gradient(135deg,var(--red-dim),var(--pink-dim));border-color:rgba(239,68,68,0.3);"><span class="quick-icon">🆘</span><div class="quick-label" style="color:var(--red);">SOS</div></div>
   </div>
 
   <div class="hero-banner gradient-3" onclick="showPage('home-foods')" data-testid="banner-home-foods">
@@ -407,7 +407,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <div class="h-scroll" id="cooksScroll"><div style="padding:8px;font-size:10px;color:var(--text3);">Loading...</div></div>
   </div>
 
-  <div class="hero-banner gradient-2" onclick="showPage('chat')">
+  <div class="hero-banner gradient-2" onclick="showPage('chat')" data-testid="banner-yatra-ai">
     <span class="hero-banner-art">🤖</span>
     <div class="hero-pretitle">🇮🇳 INDIA'S FIRST</div>
     <div class="hero-title">Meet Yatra AI</div>
@@ -1291,9 +1291,18 @@ document.addEventListener('DOMContentLoaded',()=>{
   loadKYC();
   if(!kycData) setTimeout(()=>document.getElementById('kycModal').classList.add('show'),500);
   else setTimeout(()=>document.getElementById('permModal').classList.add('show'),500);
-  loadFood(); loadCooks(); renderHeatmap();
-  // Hotel default render
+  // Always populate home-page widgets independent of any modal
+  loadFood();
+  loadCooks();
+  renderHeatmap();
   document.getElementById('hotelsContainer').innerHTML=HOTEL_DB.map(renderHotel).join('');
+  // Retry trending+cooks if they didn't render (race with food sections)
+  setTimeout(()=>{
+    const t=document.getElementById('trendingScroll');
+    if(t && t.innerHTML.indexOf('Loading')>=0) loadFood();
+    const c=document.getElementById('cooksScroll');
+    if(c && c.innerHTML.indexOf('Loading')>=0) loadCooks();
+  }, 2500);
 });
 </script>
 </body>

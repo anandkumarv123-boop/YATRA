@@ -1,84 +1,78 @@
-# Yatra Sathi — Women Safety AI Platform
+# Yatra Sathi v2 — Smart Rail Travel Companion
 
 ## Original Problem Statement
-User shared a single-file HTML app ("Yatra Sathi") for Indian Railway women-safety with SOS, AI detection, crowd heat maps, train tracking, reviews and hotels. Asked to **finish in this session** by adding:
-- Auto alerting for non-cleanliness issues
-- Authority takeover when complaint reported on portal for:
-  - Alcohol consumption inside train
-  - Smoking in train bathroom
-  - Food quality issues (IRCTC pantry)
-  - Beggars / unauthorized vendors
-- Best UI
+Started as a women-safety HTML app. User progressively expanded to a **universal passenger Smart Rail Companion** with:
+- Food On Journey (IRCTC + Zomato + Station + Local vendors)
+- Rail Home Foods (self-employment ecosystem for housewives/home cooks)
+- Station Hub intelligence (all amenities + AI smart routing)
+- Yatra AI assistant (Claude-powered chat, India-focused)
+- Live train tracking with animated progress
 - KYC verification
-- Photo upload for evidence
-- Admin dashboard
-- SMS to RPF (simulated)
+- Photo evidence upload
+- Admin dashboard with PIN
+- SMS dispatch simulation to RPF / IRCTC / Helpdesk
+- Auto-takeover complaint portal (cleanliness/alcohol/smoking/food/beggars)
+- Flipkart-style premium UI for all passengers
 
 ## Architecture
-- **Backend**: FastAPI (`/app/backend/server.py`) on port 8001, MongoDB storage
-- **Frontend**: Single static HTML (`/app/frontend/public/app.html`); React App.js redirects `/` → `/app.html`
-- **AI**: Emergent LLM key with Claude Haiku 4.5 (`claude-haiku-4-5-20251001`) via `emergentintegrations` for auto-categorization + safety tips
-- **Database**: MongoDB collections: `complaints`, `kyc`, `sos_events`, `sms_log`
+- **Backend**: FastAPI on port 8001 (`/app/backend/server.py`), MongoDB
+- **Frontend**: Single static HTML (`/app/frontend/public/app.html`, ~1130 lines); React App.js redirects `/` → `/app.html`
+- **AI**: Claude Haiku 4.5 (`claude-haiku-4-5-20251001`) via `emergentintegrations` + Emergent LLM key
+- **DB Collections**: complaints, kyc, sos_events, sms_log, food_orders, home_cooks, home_food_menu
 
-## User Personas
-- **Woman traveller** (primary): Files complaints, uses SOS, KYC verified
-- **RPF / IRCTC admin** (secondary): Logs in via PIN, manages complaints, views SMS log
+## v2 Endpoints
+### Food Ordering
+- `GET /api/food/vendors?station=X&category=Y&veg=true|false`
+- `GET /api/food/menu/{vendor_id}` (10 items: thali, biryani, dosa, paneer, family combo, diabetic, baby food, senior meal, salad, late-night maggi)
+- `GET /api/food/recommendations?station=X&diet=Y` (6 sections + Claude AI tip)
+- `POST /api/food/order` (with PNR/train/coach/seat/station)
+- `GET /api/food/order/{id}` (live tracking: preparing→cooking→packed→out_for_delivery→delivered)
 
-## Core Requirements (static)
-- One-tap SOS with GPS + audio evidence
-- Complaint portal with auto-takeover by authority
-- AI Claude-powered severity + action recommendation
-- Photo evidence upload (downscaled to 900px, JPEG q=0.75)
-- KYC verification (name, phone, Aadhaar last 4)
-- Admin dashboard with PIN auth, stats, SMS log
-- Live crowd heat maps + AI safety tips for reviews/hotels
+### Rail Home Foods
+- `POST /api/home-foods/cook` (register)
+- `GET /api/home-foods/cooks?station=X&city=Y` (auto-seeds demo cooks)
+- `POST /api/home-foods/menu` (cook adds item)
+- `GET /api/home-foods/menu/{cook_id}` (auto-seeds menu)
+- `GET /api/home-foods/insights/{cook_id}` (AI sales coach via Claude)
 
-## What's Been Implemented (Jan 2026)
-### Backend Endpoints
-- `POST /api/kyc` — KYC submission with validation
-- `POST /api/complaints` — submit complaint, AI auto-categorize, simulated SMS dispatch
-- `GET /api/complaints?category=...` — list (photo_b64 excluded for perf)
-- `GET /api/complaints/{id}/photo` — fetch photo on demand
-- `POST /api/complaints/{id}/status` — admin status update (requires X-Admin-Pin header)
-- `GET /api/complaints/stats` — aggregate stats
-- `POST /api/admin/auth` — PIN validation
-- `GET /api/admin/sms-log` — admin-only SMS dispatch log
-- `POST /api/sos` — logs SOS event + auto-creates RPF SMS log
-- `POST /api/ai/tip` — Claude proxy for review/hotel safety tips
-- `GET /api/health`
+### Station & Train
+- `GET /api/station/{code}/hub` (NDLS, CSTM, HWH, MAS, TVC, BPL, BCT, ERS, ADI + AI route)
+- `GET /api/stations/search?q=`
+- `GET /api/pnr/{pnr}` (deterministic mock)
+- `GET /api/train/{train_no}/live` (animated route, coaches, ETA)
 
-### Frontend Pages
-- Home (with stats, 6 feature cards including new Report Issue)
-- Complaint Portal (6 categories, photo upload, AI takeover banner)
-- AI Detection (live mic monitor, simulated motion/stress sensors)
-- Crowd Heat (live updating station + coach occupancy)
-- SOS (3-sec hold, KYC-aware, GPS share)
-- Reviews (with Claude AI safety analysis box)
-- Safe Hotels (10 cities, Claude AI city tip)
-- **Admin Dashboard** (PIN gated, stats, SMS log, complaint management)
+### Yatra AI Chat
+- `POST /api/ai/chat` (Claude Haiku, India-focused railway assistant)
 
-### Auto-Takeover Categories
-| Category | Severity | Authority | SMS To |
-|----------|----------|-----------|--------|
-| Cleanliness | medium | Cleaning Supervisor + Coach Attendant | +91-9717641527, +91-139 |
-| Alcohol | high | RPF / TTE | +91-182, +91-139 |
-| Smoking | high | RPF (Sec 167 fine) | +91-182, +91-1512 |
-| Food | medium | IRCTC + Pantry Manager | +91-1800-111-321, +91-139 |
-| Beggars | high | RPF / GRP | +91-182, +91-1512 |
-| Other | medium | Railway Helpdesk | +91-139 |
+### V1 retained
+- `POST /api/kyc`, complaints, SOS, admin, AI tip — all working
 
-## Testing Status
-- **Backend**: 22/22 pytest tests passed (KYC, complaints, photo, admin auth, SMS, SOS, AI tip)
-- **Frontend**: 9/9 Playwright flows passed (KYC modal, user bar reveal, 8-button bottom nav fixed, complaint submission with AI summary, admin PIN unlock + dashboard, SOS 3-sec hold)
+## Frontend Pages (12)
+Home (Flipkart layout) · Food · Home Foods (Customer/Cook tabs) · Live Trains · PNR · Station Hub · Yatra AI Chat · SOS · AI Detect · Crowd · Complaints · Hotels · Admin
 
-## Backlog / Next Tasks
-- P1: Move photo storage to S3/GridFS for scale
-- P1: Convert admin PIN auth → session token + httponly cookie
-- P2: Real SMS dispatch via Twilio / MSG91
-- P2: Map view for SOS / complaint hotspots
-- P2: Multi-language support (Hindi, Tamil, Telugu)
-- P3: Push notifications for SOS recipients
-- P3: Refactor app.html into modular JS/CSS
+## Testing
+- **v2 backend**: 43/43 pytest tests passing (KYC, complaints, admin, SOS, AI tip, food vendors/menu/recommendations/order/tracking, home cook register/list/menu/insights, station hub, PNR, train live, AI chat)
+- **v2 frontend**: Home/Food/Home-Foods/Trains/PNR/Station Hub/Yatra AI Chat all visually verified with correct testids and live data
+
+## Fixes after iteration 2 testing
+- Added data-testid on all 8 home quick-grid tiles
+- Added data-testid=`banner-yatra-ai` for consistency
+- Fixed `Trending Near You` + `Home Kitchens` slow-paint race with retry after 2.5s
+- Added empty-items validation to POST /api/food/order
+
+## Backlog
+- P1: Real Twilio/MSG91 SMS dispatch (currently simulated)
+- P1: Voice input for Yatra AI (Whisper STT)
+- P1: Photo storage → S3/GridFS
+- P2: Real IRCTC eCatering API integration
+- P2: Map view of nearby cooks/stations
+- P2: Hindi/Tamil/Telugu language support
+- P3: Push notifications for SOS + order updates
+- P3: Cook earnings withdrawal flow (UPI integration)
 
 ## Test Credentials
-- Admin PIN: `1234` (overridable via `ADMIN_PIN` env var)
+- Admin PIN: `1234` (env `ADMIN_PIN`)
+- KYC: any 2+ char name, 10-digit phone, 4-digit Aadhaar
+- PNR test: `1234567890` returns Mumbai Rajdhani
+- Train test: `12951` returns animated live route
+- Station hub test: `NDLS`, `CSTM`, `HWH`, `MAS`, `BPL`, `TVC`, `BCT`, `ERS`, `ADI`

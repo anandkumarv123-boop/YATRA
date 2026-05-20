@@ -336,6 +336,7 @@ async def food_recs(station: Optional[str]=None, diet: Optional[str]=None, trave
 
 @api_router.post("/food/order")
 async def food_order(payload: FoodOrderCreate):
+    if not payload.items: raise HTTPException(400, "Cart is empty")
     vendor = next((v for v in FOOD_VENDORS if v["id"]==payload.vendor_id), None)
     if not vendor: raise HTTPException(404,"Vendor not found")
     total = sum(i.get("price",0)*i.get("qty",1) for i in payload.items)
