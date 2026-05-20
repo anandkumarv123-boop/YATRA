@@ -1074,8 +1074,11 @@ async function trackTrain(){
     const route=d.route;
     const curIdx=route.indexOf(d.current_station);
     box.innerHTML=`<div class="panel">
-      <div class="panel-title">🚂 ${d.train_name}</div>
-      <div style="font-size:10.5px;color:var(--text2);margin-bottom:4px;"><strong>${d.source}</strong> → <strong>${d.destination}</strong></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div><div class="panel-title">🚂 ${d.train_name}</div>${d.train_type?`<div style="font-size:9px;color:var(--orange);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-top:2px;">${d.train_type}</div>`:''}</div>
+        <div style="font-size:8px;font-weight:800;letter-spacing:0.5px;padding:3px 8px;border-radius:6px;${d.data_source && d.data_source.includes('RailRadar')?'background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3);':'background:rgba(245,158,11,0.15);color:var(--amber);'}">${d.data_source||'LIVE'}</div>
+      </div>
+      <div style="font-size:10.5px;color:var(--text2);margin-bottom:4px;margin-top:6px;"><strong>${d.source}</strong> → <strong>${d.destination}</strong>${d.distance_km?` · ${Math.round(d.distance_km)} km`:''}</div>
       <div class="train-route-viz">
         <div class="train-track"><div class="train-fill" id="tFill" style="width:0%;"></div><div class="train-loco" id="tLoco" style="left:0%;">🚂</div></div>
         <div class="train-stops">${route.map((s,i)=>`<div class="train-stop ${i<curIdx?'passed':i===curIdx?'current':''}"><div class="train-stop-dot"></div>${s}</div>`).join('')}</div>

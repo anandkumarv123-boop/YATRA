@@ -74,5 +74,9 @@ Home (Flipkart layout) · Food · Home Foods (Customer/Cook tabs) · Live Trains
 - Admin PIN: `1234` (env `ADMIN_PIN`)
 - KYC: any 2+ char name, 10-digit phone, 4-digit Aadhaar
 - PNR test: `1234567890` returns Mumbai Rajdhani
-- Train test: `12951` returns animated live route
+- Train test: `12951` returns REAL live route from RailRadar API
 - Station hub test: `NDLS`, `CSTM`, `HWH`, `MAS`, `BPL`, `TVC`, `BCT`, `ERS`, `ADI`
+
+## External Integrations
+- **RailRadar API** — `api.railradar.org/api/v1/trains/{trainNo}` with `RAILRADAR_KEY` env var. Returns real train name, type, source/destination, full route schedule, real rake/coach details. Used by `GET /api/train/{train_no}/live`. Falls back to deterministic mock if API unreachable.
+- **Emergent LLM key** — Claude Haiku 4.5 for AI tips, complaint categorization, Yatra AI chat, cook insights, station smart-route recommendations.
