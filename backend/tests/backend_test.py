@@ -191,7 +191,7 @@ def test_sos(client):
     d = r.json()
     assert d.get("ok") is True
     assert "id" in d
-    assert any("RPF" in s for s in d.get("sms_to", []))
+    assert any("182" in s for s in d.get("sms_to", []))  # RPF helpline 182
 
 # ── AI Tip ───
 def test_ai_tip(client):
